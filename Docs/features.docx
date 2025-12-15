@@ -1,0 +1,37 @@
+Plant Selling Platform – Feature Description
+
+1. Basic Features of the Platform
+
+The plant selling platform is an e-commerce website designed for selling indoor and outdoor plants. It provides a smooth and user-friendly experience for customers as well as administrators.
+
+- User Registration and Login: Users can sign up, log in, and manage their profiles.
+- Indoor and Outdoor Plant Categories: Plants are categorized for easy browsing.
+- Product Listing Page: Displays plants with images, price, and basic details.
+- Product Detail Page: Shows detailed plant information such as description, price, and care type.
+- Add to Cart and Checkout: Users can add plants to cart and place orders.
+- Order Management: Users can view their order history.
+- Admin Panel: Admin can add, update, and delete plant products.
+
+2. Advanced Feature: AI-Powered Plant Assistant
+
+To make the platform unique and intelligent, an AI-powered plant assistant chatbot is integrated.
+
+- Plant Care Question Answering: Users can ask questions related to plant care.
+- Problem Diagnosis: The chatbot identifies common plant issues based on user input.
+- Correction Suggestions: Provides simple and step-by-step solutions to plant problems.
+- Beginner-Friendly Responses: Answers are short, clear, and easy to understand.
+- Product Suggestions: Recommends suitable plants or care products when required.
+
+3. Additional Feature: AI-Assisted Plant Image Scanning
+
+The platform also includes an AI-assisted image scanning feature to enhance plant problem diagnosis.
+
+- Image Upload: Users can upload images of their plants through the chatbot.
+- Visual Symptom Analysis: AI analyzes visible symptoms like yellow leaves or wilting.
+- Probable Cause Identification: Suggests possible reasons for the problem.
+- Care and Correction Guidance: Provides corrective steps based on visual analysis.
+- Safe Guidance Disclaimer: The system provides guidance, not certified medical diagnosis.
+
+4. Conclusion
+
+By combining basic e-commerce functionality with an AI-powered plant assistant and image scanning feature, the platform becomes a smart plant care solution rather than just an online store. This improves user 
