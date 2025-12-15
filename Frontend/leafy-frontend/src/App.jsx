@@ -1,9 +1,24 @@
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Shop from './pages/Shop';
+import PlantCare from './pages/PlantCare';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Cart from './pages/Cart';
+import Account from './pages/Account';
+
 function App() {
   return (
-    <div>
-      <h1>🌱 Leafy</h1>
-      <p>Indoor & Outdoor Plant Store with AI Plant Care Assistant</p>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="/shop/:category" element={<Shop />} />
+      <Route path="/plant-care" element={<PlantCare />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/account" element={<Account />} />
+    </Routes>
   );
 }
 
