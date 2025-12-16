@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import './FeaturedCategories.css';
+import cat1 from '../imgs/cat1.png';
+import cat2 from '../imgs/cat2.png';
+import cat3 from '../imgs/cat3.png';
+import cat4 from '../imgs/cat4.png';
 
 function FeaturedCategories() {
   const categories = [
@@ -7,28 +11,28 @@ function FeaturedCategories() {
       id: 1,
       title: 'Indoor Plants',
       description: 'Perfect for any room',
-      image: 'https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=400&h=400&fit=crop',
+      image: cat1,
       link: '/shop/indoor'
     },
     {
       id: 2,
       title: 'Outdoor Plants',
       description: 'For your garden or patio',
-      image: 'https://images.unsplash.com/photo-1466781783364-36c955e42a7f?w=400&h=400&fit=crop',
+      image: cat2,
       link: '/shop/outdoor'
     },
     {
       id: 3,
       title: 'Succulents',
       description: 'Low maintenance beauties',
-      image: 'https://images.unsplash.com/photo-1459156212016-c812468e2115?w=400&h=400&fit=crop',
+      image: cat3,
       link: '/shop/succulents'
     },
     {
       id: 4,
       title: 'Plant Care',
       description: 'Tools and accessories',
-      image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400&h=400&fit=crop',
+      image: cat4,
       link: '/plant-care'
     }
   ];

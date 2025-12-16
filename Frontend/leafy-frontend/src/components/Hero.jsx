@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import './Hero.css';
+import hero1 from '../imgs/hero1.png';
 
 function Hero() {
   return (
@@ -18,8 +19,7 @@ function Hero() {
           </Link>
         </div>
         <div className="hero-image">
-          <img 
-            src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=600&h=600&fit=crop" 
+          <img src={hero1} 
             alt="Monstera plant in white pot"
           />
         </div>

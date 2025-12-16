@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import './PopularPicks.css';
+import picks1 from '../imgs/picks1.png';
+import picks2 from '../imgs/picks2.png';
+import picks3 from '../imgs/picks3.png';
+import picks4 from '../imgs/picks4.png';
 
 function PopularPicks() {
   const products = [
@@ -7,25 +11,25 @@ function PopularPicks() {
       id: 1,
       name: 'Monstera Deliciosa',
       price: 25.00,
-      image: 'https://images.unsplash.com/photo-1614594895304-fe7116ac3b58?w=400&h=400&fit=crop'
+      image: picks1
     },
     {
       id: 2,
       name: 'Snake Plant',
       price: 22.00,
-      image: 'https://images.unsplash.com/photo-1593482892540-73c6eb07a650?w=400&h=400&fit=crop'
+      image: picks2
     },
     {
       id: 3,
       name: 'Fiddle Leaf Fig',
       price: 34.00,
-      image: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=400&h=400&fit=crop'
+      image: picks3
     },
     {
       id: 4,
       name: 'Golden Pothos',
       price: 19.00,
-      image: 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=400&h=400&fit=crop'
+      image: picks4
     }
   ];
 
