@@ -1,0 +1,20 @@
+{
+  "name": "leafy-plant-selling-platform",
+  "version": "1.0.0",
+  "description": "A platform for selling leafy plants",
+  "private": true,
+  "workspaces": [
+    "Frontend/leafy-frontend",
+    "Backend"
+  ],
+  "scripts": {
+    "dev": "cd Frontend/leafy-frontend && npm run dev",
+    "build": "cd Frontend/leafy-frontend && npm run build",
+    "preview": "cd Frontend/leafy-frontend && npm run preview",
+    "lint": "cd Frontend/leafy-frontend && npm run lint",
+    "backend": "cd Backend && node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
