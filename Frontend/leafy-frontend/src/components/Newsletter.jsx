@@ -1,15 +1,6 @@
-import { useState } from 'react';
 import './Newsletter.css';
 
-function Newsletter() {
-  const [email, setEmail] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Subscribed with: ${email}`);
-    setEmail('');
-  };
-
+export default function Newsletter() {
   return (
     <section className="newsletter">
       <div className="newsletter-container">
@@ -18,13 +9,11 @@ function Newsletter() {
           Get 10% off your first order and stay up to date with the latest plant care tips,
           new arrivals and special offers.
         </p>
-        <form className="newsletter-form" onSubmit={handleSubmit}>
+        <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert('Coming soon!'); }}>
           <input
             type="email"
             placeholder="Enter your email"
             className="newsletter-input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <button type="submit" className="newsletter-button">
@@ -35,5 +24,3 @@ function Newsletter() {
     </section>
   );
 }
-
-export default Newsletter;

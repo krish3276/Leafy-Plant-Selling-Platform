@@ -43,7 +43,7 @@ function Navbar() {
           <Link to="/cart" className="icon-link">
             <ShoppingCart size={22} />
           </Link>
-          <Link to="/account" className="icon-link">
+          <Link to="/login" className="icon-link">
             <User size={22} />
           </Link>
         </div>
