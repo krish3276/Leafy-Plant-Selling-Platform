@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './PopularPicks.css';
 import picks1 from '../imgs/picks1.png';

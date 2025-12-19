@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Chrome, Facebook, Eye, EyeOff } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import '../styles/Auth.css';
 
 function SignUp() {
@@ -95,9 +93,7 @@ function SignUp() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="auth-container">
+    <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
             <h1>Create Account</h1>
@@ -256,9 +252,7 @@ function SignUp() {
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
-  );
-}
-
-export default SignUp;
+    );
+  }
+  
+  export default SignUp;

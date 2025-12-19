@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, LogOut, ShoppingBag, Heart, Package, Home, Sprout } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import '../styles/Account.css';
 
 function Account() {
@@ -92,12 +90,8 @@ function Account() {
 
   if (!user) {
     return (
-      <div>
-        <Navbar />
-        <div className="loading-container">
-          <p>Loading...</p>
-        </div>
-        <Footer />
+      <div className="loading-container">
+        <p>Loading...</p>
       </div>
     );
   }
@@ -165,10 +159,8 @@ function Account() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="account-container">
-        <div className="account-wrapper">
+    <div className="account-container">
+      <div className="account-wrapper">
           {/* Sidebar */}
           <aside className="account-sidebar">
             <div className="profile-card">
@@ -488,9 +480,7 @@ function Account() {
           </main>
         </div>
       </div>
-      <Footer />
-    </div>
-  );
-}
-
-export default Account;
+    );
+  }
+  
+  export default Account;

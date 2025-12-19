@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './Hero.css';
 import hero1 from '../imgs/hero1.png';

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Truck, BookOpen, Leaf } from 'lucide-react';
 import './WhyShop.css';
 
