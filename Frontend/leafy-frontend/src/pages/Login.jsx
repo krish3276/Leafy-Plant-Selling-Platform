@@ -1,7 +1,6 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Chrome, Facebook } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import '../styles/Auth.css';
 
 function Login() {
@@ -43,9 +42,7 @@ function Login() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="auth-container">
+    <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
             <h1>Welcome Back</h1>
@@ -125,9 +122,7 @@ function Login() {
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
-  );
-}
-
-export default Login;
+    );
+  }
+  
+  export default Login;

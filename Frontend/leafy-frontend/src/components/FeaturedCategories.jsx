@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './FeaturedCategories.css';
 import cat1 from '../imgs/indoor.png';
