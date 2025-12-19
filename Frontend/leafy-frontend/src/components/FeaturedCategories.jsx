@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import './FeaturedCategories.css';
-import cat1 from '../imgs/cat1.png';
-import cat2 from '../imgs/cat2.png';
-import cat3 from '../imgs/cat3.png';
-import cat4 from '../imgs/cat4.png';
+import cat1 from '../imgs/indoor.png';
+import cat2 from '../imgs/outdoor.jpg';
+import cat3 from '../imgs/succulent .png';
+import cat4 from '../imgs/tools.png';
+
 
 function FeaturedCategories() {
   const categories = [
