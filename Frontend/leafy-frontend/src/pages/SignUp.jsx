@@ -36,6 +36,12 @@ function SignUp() {
       return;
     }
 
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError('Password must contain uppercase, lowercase, and number');
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -43,7 +49,7 @@ function SignUp() {
     }
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,6 +57,7 @@ function SignUp() {
           lastName,
           email,
           password,
+          confirmPassword,
         }),
       });
 
@@ -61,11 +68,17 @@ function SignUp() {
         window.location.href = '/account';
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Sign up failed. Please try again.');
+        console.error('Backend error:', errorData);
+        
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          setError(errorData.errors.map(err => err.msg).join(', '));
+        } else {
+          setError(errorData.message || 'Sign up failed. Please try again.');
+        }
       }
     } catch (err) {
-      setError('Sign up failed. Please try again.');
       console.error('Sign up error:', err);
+      setError('Connection error. Please check if backend is running.');
     } finally {
       setLoading(false);
     }
