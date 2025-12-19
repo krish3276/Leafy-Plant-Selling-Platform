@@ -216,6 +216,28 @@
   color: #b71c1c;
 }
 
+/* Admin Link */
+.admin-link {
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+}
+
+.admin-link:hover {
+  background-color: #2d5f3f;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(45, 95, 63, 0.2);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .navbar-container {

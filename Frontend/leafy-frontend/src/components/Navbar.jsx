@@ -55,6 +55,9 @@ function Navbar() {
           <Link to={isLoggedIn ? "/account" : "/login"} className="icon-link">
             <User size={22} />
           </Link>
+          <Link to="/admin/login" className="admin-link" title="Admin Portal">
+            🔐
+          </Link>
         </div>
       </div>
     </nav>

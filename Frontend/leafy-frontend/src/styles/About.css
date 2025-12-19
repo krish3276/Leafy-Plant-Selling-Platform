@@ -92,7 +92,7 @@
   padding-bottom: 1rem;
 }
 
-.section-title::after {
+/* .section-title::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -101,7 +101,7 @@
   height: 4px;
   background-color: #2d5f3f;
   border-radius: 2px;
-}
+} */
 
 .story-content {
   max-width: 500px;
