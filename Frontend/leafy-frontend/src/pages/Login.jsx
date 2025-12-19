@@ -22,6 +22,8 @@ function Login() {
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        // Show success message
+        alert('Login successful! Welcome back!');
         window.location.href = '/account';
       } else {
         alert('Invalid email or password');

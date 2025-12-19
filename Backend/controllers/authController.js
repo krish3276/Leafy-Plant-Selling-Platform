@@ -48,10 +48,14 @@ export const signup = async (req, res) => {
       token, // JWT token for authentication
       user: {
         id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        phone: user.phone || '',
+        address: user.address || '',
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -108,10 +112,14 @@ export const login = async (req, res) => {
       token,
       user: {
         id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        phone: user.phone || '',
+        address: user.address || '',
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {

@@ -65,6 +65,8 @@ function SignUp() {
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        // Show success message
+        alert('Account created successfully! Welcome to Leafy!');
         window.location.href = '/account';
       } else {
         const errorData = await response.json();

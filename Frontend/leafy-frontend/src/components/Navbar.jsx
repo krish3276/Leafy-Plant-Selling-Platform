@@ -1,8 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User } from 'lucide-react';
 import './Navbar.css';
 
 function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const authToken = localStorage.getItem('authToken');
+    setIsLoggedIn(!!authToken);
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -43,7 +52,7 @@ function Navbar() {
           <Link to="/cart" className="icon-link">
             <ShoppingCart size={22} />
           </Link>
-          <Link to="/login" className="icon-link">
+          <Link to={isLoggedIn ? "/account" : "/login"} className="icon-link">
             <User size={22} />
           </Link>
         </div>
