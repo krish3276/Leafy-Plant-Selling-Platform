@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { productAPI } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
+import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
 function Shop() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [addingToCart, setAddingToCart] = useState(null);
+  const [notification, setNotification] = useState(null);
   const [filters, setFilters] = useState({
     category: '',
     search: '',
@@ -46,9 +50,34 @@ function Shop() {
     setFilters({ ...filters, sort: e.target.value });
   };
 
-  const addToCart = (productId) => {
-    // TODO: Implement cart functionality
-    alert('Product added to cart! (Cart functionality coming soon)');
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const addToCart = async (productId) => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      showNotification('Please log in to add items to cart', 'error');
+      setTimeout(() => navigate('/login'), 1500);
+      return;
+    }
+
+    setAddingToCart(productId);
+    try {
+      const response = await cartAPI.addToCart(productId, 1);
+      if (response.success) {
+        showNotification('🌱 Added to cart!', 'success');
+        // Dispatch custom event to update navbar cart count
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
+      }
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      showNotification(err.message || 'Failed to add to cart', 'error');
+    } finally {
+      setAddingToCart(null);
+    }
   };
 
   if (loading) {
@@ -69,6 +98,12 @@ function Shop() {
 
   return (
     <div className="shop-container">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`shop-notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
       <div className="shop-header">
         <h1>Shop All Plants</h1>
         <p>Discover our full collection of beautiful plants</p>
@@ -167,11 +202,15 @@ function Shop() {
                   </div>
 
                   <button
-                    className="add-to-cart-btn"
+                    className={`add-to-cart-btn ${addingToCart === product._id ? 'adding' : ''}`}
                     onClick={() => addToCart(product._id)}
-                    disabled={product.stock === 0}
+                    disabled={product.stock === 0 || addingToCart === product._id}
                   >
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    {product.stock === 0 
+                      ? 'Out of Stock' 
+                      : addingToCart === product._id 
+                        ? 'Adding...' 
+                        : 'Add to Cart'}
                   </button>
                 </div>
               </div>

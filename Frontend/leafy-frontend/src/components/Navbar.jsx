@@ -1,15 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User } from 'lucide-react';
+import { cartAPI } from '../utils/api';
 import './Navbar.css';
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  const fetchCartCount = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const response = await cartAPI.getCart();
+      if (response.success && response.cart) {
+        const totalItems = response.cart.reduce((sum, item) => sum + item.quantity, 0);
+        setCartCount(totalItems);
+      }
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+    }
+  };
 
   useEffect(() => {
     // Check if user is logged in
     const authToken = localStorage.getItem('authToken');
     setIsLoggedIn(!!authToken);
+    
+    // Fetch cart count if logged in
+    if (authToken) {
+      fetchCartCount();
+    }
+
+    // Listen for cart updates
+    const handleCartUpdate = () => fetchCartCount();
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    // Listen for storage changes (login/logout)
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('authToken');
+      setIsLoggedIn(!!token);
+      if (token) {
+        fetchCartCount();
+      } else {
+        setCartCount(0);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   return (
@@ -49,8 +95,11 @@ function Navbar() {
 
         {/* Icons */}
         <div className="navbar-icons">
-          <Link to="/cart" className="icon-link">
+          <Link to="/cart" className="icon-link cart-icon-wrapper">
             <ShoppingCart size={22} />
+            {cartCount > 0 && (
+              <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>
+            )}
           </Link>
           <Link to={isLoggedIn ? "/account" : "/login"} className="icon-link">
             <User size={22} />

@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 // Get auth token from localStorage
 const getAuthToken = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem('authToken');
 };
 
 // Create headers with optional auth
@@ -287,7 +287,7 @@ export const cartAPI = {
   },
 
   addToCart: async (productId, quantity = 1) => {
-    const response = await fetch(`${API_BASE_URL}/cart`, {
+    const response = await fetch(`${API_BASE_URL}/cart/add`, {
       method: 'POST',
       headers: createHeaders(true),
       body: JSON.stringify({ productId, quantity }),
@@ -302,10 +302,10 @@ export const cartAPI = {
   },
 
   updateCartItem: async (productId, quantity) => {
-    const response = await fetch(`${API_BASE_URL}/cart/${productId}`, {
+    const response = await fetch(`${API_BASE_URL}/cart/update`, {
       method: 'PUT',
       headers: createHeaders(true),
-      body: JSON.stringify({ quantity }),
+      body: JSON.stringify({ productId, quantity }),
     });
 
     if (!response.ok) {
@@ -316,7 +316,7 @@ export const cartAPI = {
   },
 
   removeFromCart: async (productId) => {
-    const response = await fetch(`${API_BASE_URL}/cart/${productId}`, {
+    const response = await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
       method: 'DELETE',
       headers: createHeaders(true),
     });
@@ -329,7 +329,7 @@ export const cartAPI = {
   },
 
   clearCart: async () => {
-    const response = await fetch(`${API_BASE_URL}/cart`, {
+    const response = await fetch(`${API_BASE_URL}/cart/clear`, {
       method: 'DELETE',
       headers: createHeaders(true),
     });
