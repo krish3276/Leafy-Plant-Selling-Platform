@@ -133,6 +133,20 @@
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
 }
 
+.product-image-link {
+  display: block;
+  text-decoration: none;
+}
+
+.product-name-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-name-link:hover .product-name {
+  color: #4caf50;
+}
+
 .product-image {
   position: relative;
   width: 100%;

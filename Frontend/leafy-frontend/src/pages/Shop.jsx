@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
@@ -178,17 +178,21 @@ function Shop() {
           <div className="products-grid">
             {products.map((product) => (
               <div key={product._id} className="product-card">
-                <div className="product-image">
-                  <img src={product.image} alt={product.name} />
-                  {product.stock === 0 && (
-                    <div className="out-of-stock-badge">Out of Stock</div>
-                  )}
-                  {product.stock > 0 && product.stock < 10 && (
-                    <div className="low-stock-badge">Only {product.stock} left!</div>
-                  )}
-                </div>
+                <Link to={`/product/${product._id}`} className="product-image-link">
+                  <div className="product-image">
+                    <img src={product.image} alt={product.name} />
+                    {product.stock === 0 && (
+                      <div className="out-of-stock-badge">Out of Stock</div>
+                    )}
+                    {product.stock > 0 && product.stock < 10 && (
+                      <div className="low-stock-badge">Only {product.stock} left!</div>
+                    )}
+                  </div>
+                </Link>
                 <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
+                  <Link to={`/product/${product._id}`} className="product-name-link">
+                    <h3 className="product-name">{product.name}</h3>
+                  </Link>
                   <p className="product-category">{product.category}</p>
                   <p className="product-price">${product.price.toFixed(2)}</p>
                   

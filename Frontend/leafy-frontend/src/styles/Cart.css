@@ -362,6 +362,7 @@
 }
 
 .checkout-btn {
+  display: block;
   width: 100%;
   background: #4caf50;
   color: white;
@@ -373,12 +374,16 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .checkout-btn:hover {
   background: #388e3c;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  color: white;
 }
 
 .secure-checkout {

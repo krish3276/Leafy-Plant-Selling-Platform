@@ -272,9 +272,9 @@ function Cart() {
             <span>${total.toFixed(2)}</span>
           </div>
 
-          <button className="checkout-btn" onClick={() => alert('Checkout coming soon!')}>
+          <Link to="/checkout" className="checkout-btn">
             Proceed to Checkout
-          </button>
+          </Link>
 
           <div className="secure-checkout">
             🔒 Secure Checkout

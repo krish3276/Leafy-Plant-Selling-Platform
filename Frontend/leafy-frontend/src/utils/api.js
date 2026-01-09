@@ -342,9 +342,73 @@ export const cartAPI = {
   },
 };
 
+// ==================== ORDER APIs ====================
+
+export const orderAPI = {
+  // Create a new order
+  createOrder: async (orderData) => {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create order');
+    }
+
+    return await response.json();
+  },
+
+  // Get user's orders
+  getMyOrders: async () => {
+    const response = await fetch(`${API_BASE_URL}/orders/my-orders`, {
+      method: 'GET',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch orders');
+    }
+
+    return await response.json();
+  },
+
+  // Get single order
+  getOrderById: async (orderId) => {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+      method: 'GET',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch order');
+    }
+
+    return await response.json();
+  },
+
+  // Cancel order
+  cancelOrder: async (orderId) => {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+      method: 'PUT',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to cancel order');
+    }
+
+    return await response.json();
+  },
+};
+
 export default {
   productAPI,
   adminAPI,
   authAPI,
   cartAPI,
+  orderAPI,
 };
