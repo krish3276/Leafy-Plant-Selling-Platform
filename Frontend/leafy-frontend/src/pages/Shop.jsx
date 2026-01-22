@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Search, ShoppingCart, Loader2 } from 'lucide-react';
 import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
@@ -210,11 +211,19 @@ function Shop() {
                     onClick={() => addToCart(product._id)}
                     disabled={product.stock === 0 || addingToCart === product._id}
                   >
-                    {product.stock === 0 
-                      ? 'Out of Stock' 
-                      : addingToCart === product._id 
-                        ? 'Adding...' 
-                        : 'Add to Cart'}
+                    {product.stock === 0 ? (
+                      'Out of Stock'
+                    ) : addingToCart === product._id ? (
+                      <>
+                        <Loader2 size={18} className="spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart size={18} />
+                        Add to Cart
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
