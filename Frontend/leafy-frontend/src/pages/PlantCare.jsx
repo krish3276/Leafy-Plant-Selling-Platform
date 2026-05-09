@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Leaf, RotateCcw, Bot, User } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Send, Leaf, RotateCcw, Bot, User, AlertCircle } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 import '../styles/PlantCare.css';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -9,6 +10,89 @@ const WELCOME_MESSAGE = {
   role: 'assistant',
   content:
     "Hi there! I'm Leafy, your personal plant care assistant! I can help you with watering schedules, sunlight needs, soil tips, pest problems, and anything else your green friends might need. What plant question can I help you with today?",
+};
+
+// Diagnosis Card Component
+const DiagnosisCard = ({ data }) => {
+  if (!data) return null;
+
+  const healthColor = 
+    data.healthScore >= 80 ? '#22c55e' :
+    data.healthScore >= 50 ? '#eab308' :
+    '#ef4444';
+
+  const urgencyBadgeClass = `urgency-badge urgency-${data.urgency || 'low'}`;
+
+  return (
+    <div className="diagnosis-card">
+      <div className="diagnosis-header">
+        <h3 className="diagnosis-plant-name">🌿 {data.plantName || 'Unknown Plant'}</h3>
+        <span className={urgencyBadgeClass}>{(data.urgency || 'low').toUpperCase()}</span>
+      </div>
+
+      <div className="diagnosis-health">
+        <div className="health-info">
+          <span className="health-label">Health Score</span>
+          <span className="health-value">{data.healthScore || 50}%</span>
+        </div>
+        <div className="health-bar-container">
+          <div 
+            className="health-bar-fill" 
+            style={{ 
+              width: `${data.healthScore || 50}%`,
+              backgroundColor: healthColor
+            }}
+          />
+        </div>
+      </div>
+
+      {data.condition && (
+        <p className="diagnosis-condition">{data.condition}</p>
+      )}
+
+      {data.symptoms && data.symptoms.length > 0 && (
+        <div className="diagnosis-section">
+          <h4 className="section-title">📋 Symptoms</h4>
+          <ul className="diagnosis-list">
+            {data.symptoms.map((s, i) => <li key={i}>{s}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {data.issues && data.issues.length > 0 && (
+        <div className="diagnosis-section">
+          <h4 className="section-title">⚠️ Issues</h4>
+          <ul className="diagnosis-list">
+            {data.issues.map((issue, i) => <li key={i}>{issue}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {data.treatments && data.treatments.length > 0 && (
+        <div className="diagnosis-section">
+          <h4 className="section-title">💊 Treatments</h4>
+          <ul className="diagnosis-list">
+            {data.treatments.map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {data.preventiveCare && data.preventiveCare.length > 0 && (
+        <div className="diagnosis-section">
+          <h4 className="section-title">🛡️ Preventive Care</h4>
+          <ul className="diagnosis-list">
+            {data.preventiveCare.map((pc, i) => <li key={i}>{pc}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {data.analysis && (
+        <div className="diagnosis-analysis">
+          <p>{data.analysis}</p>
+        </div>
+      )}
+    </div>
+  );
 };
 
 // Render basic markdown: **bold** and line-breaks
@@ -74,6 +158,10 @@ const SUGGESTIONS = [
 function PlantCare() {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [diagnosis, setDiagnosis] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const chatBoxRef = useRef(null);
   const inputRef = useRef(null);
@@ -90,22 +178,140 @@ function PlantCare() {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles && acceptedFiles[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    // Do not auto-analyze on drop — analysis happens when user presses Send
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { 'image/*': [] }, maxFiles: 1 });
+
+  const uploadImage = async (file) => {
+    setIsAnalyzing(true);
+    setDiagnosis(null);
+    console.log('[PlantCare] Starting image analysis...');
+    try {
+      const form = new FormData();
+      form.append('image', file);
+      form.append('message', input || '');
+
+      console.log('[PlantCare] Sending image to backend:', {
+        fileName: file?.name,
+        fileSize: file?.size,
+        fileType: file?.type,
+      });
+
+      const resp = await fetch(`${API_BASE_URL}/chat/analyze-image`, {
+        method: 'POST',
+        body: form,
+      });
+      
+      console.log('[PlantCare] Backend response status:', resp.status);
+      const json = await resp.json();
+      console.log('[PlantCare] Backend response:', json);
+
+      if (!resp.ok) {
+        const errMsg = json?.error || json?.raw || json?.message || `Server error ${resp.status}`;
+        console.error('[PlantCare] Analysis error:', errMsg);
+        setDiagnosis({ error: errMsg });
+        return { success: false, error: errMsg };
+      }
+      if (!json.success) {
+        const errMsg = json?.error || json?.raw || json?.message || 'Analysis failed';
+        console.error('[PlantCare] Analysis unsuccessful:', errMsg);
+        setDiagnosis({ error: errMsg });
+        return { success: false, error: errMsg };
+      }
+
+      const data = json.data;
+      console.log('[PlantCare] Analysis successful:', data);
+      setDiagnosis(data);
+
+      // Create image preview URL
+      const imageUrl = URL.createObjectURL(file);
+
+      return { success: true, diagData: data, imageUrl };
+    } catch (err) {
+      console.error('[PlantCare] Image analysis exception:', err);
+      const errMsg = err.message || 'Analysis failed';
+      setDiagnosis({ error: errMsg });
+      return { success: false, error: errMsg };
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSend = async () => {
-    const userText = input.trim();
-    if (!userText || isStreaming) return;
+    // Allow sending if there's text OR an attached image
+    const userTextRaw = input.trim();
+    if (!userTextRaw && !selectedFile) return;
+    if (isStreaming) return;
+
+    console.log('[PlantCare] handleSend called with:', {
+      textLength: userTextRaw.length,
+      hasImage: !!selectedFile,
+      isAnalyzing,
+    });
+
+    // If there's an attached image, analyze it first
+    let diagData = null;
+    let imageUrl = null;
+    if (selectedFile && !isAnalyzing) {
+      console.log('[PlantCare] Analyzing attached image...');
+      const res = await uploadImage(selectedFile);
+      diagData = res?.diagData;
+      imageUrl = res?.imageUrl;
+      // clear selection after analysis attempt
+      setSelectedFile(null);
+      setPreviewUrl('');
+      console.log('[PlantCare] Image analysis result:', { success: res?.success, hasError: !!res?.error });
+    }
 
     const history = messages
-      .filter((m) => m.id !== 'welcome')
+      .filter((m) => m.id !== 'welcome' && !m.id?.toString().startsWith('diag-'))
       .map((m) => ({ role: m.role, content: m.content }));
 
-    const userMessage = { id: Date.now(), role: 'user', content: userText };
-    const botMessage = { id: Date.now() + 1, role: 'assistant', content: '' };
+    const userText = userTextRaw || (imageUrl ? '' : 'Message');
+    
+    // Build the message content - include diagnosis context if available
+    let finalUserContent = userText;
+    if (diagData) {
+      finalUserContent = `Plant Diagnosis:\nPlant: ${diagData.plantName}\nHealth: ${diagData.healthScore}%\nIssues: ${diagData.issues?.join(', ') || 'None'}\n\nFollow-up: ${userText}`;
+    }
 
+    // Create user message with image only (on sending side)
+    const userMessage = { 
+      id: Date.now(), 
+      role: 'user', 
+      content: userText,
+      imageUrl // Store image URL for display on user side
+    };
+    
+    // Create bot message with diagnosis data (on receive side)
+    const botMessage = { 
+      id: Date.now() + 1, 
+      role: 'assistant', 
+      content: '',
+      diagnosis: diagData // Store diagnosis for display on bot side
+    };
+
+    // Add both messages to chat
     setMessages((prev) => [...prev, userMessage, botMessage]);
     setInput('');
     setIsStreaming(true);
 
-    const apiMessages = [...history, { role: 'user', content: userText }];
+    // For API: send history + user message (diagnosis context embedded in user message)
+    const apiMessages = [...history, { role: 'user', content: finalUserContent }];
+
+    console.log('[PlantCare] Sending chat message with history length:', history.length);
 
     try {
       const controller = new AbortController();
@@ -233,6 +439,7 @@ function PlantCare() {
       <section className="plantcare-chat-section">
         <div className="plantcare-chat-card">
 
+
           {/* Header */}
           <div className="chat-header">
             <div className="chat-header-left">
@@ -277,6 +484,20 @@ function PlantCare() {
                       <span />
                       <span />
                     </span>
+                  ) : msg.role === 'user' && msg.imageUrl ? (
+                    // For user message: show image thumbnail + text only
+                    <div>
+                      <img 
+                        src={msg.imageUrl} 
+                        alt="plant" 
+                        className="chat-image-thumbnail"
+                        style={{ maxWidth: '200px', borderRadius: '8px', marginBottom: '12px' }}
+                      />
+                      {msg.content && <p className="bubble-text">{renderContent(msg.content)}</p>}
+                    </div>
+                  ) : msg.role === 'assistant' && msg.diagnosis ? (
+                    // For bot message: show diagnosis card
+                    <DiagnosisCard data={msg.diagnosis} />
                   ) : (
                     <p className="bubble-text">{renderContent(msg.content)}</p>
                   )}
@@ -309,6 +530,18 @@ function PlantCare() {
 
           {/* Input */}
           <div className="chat-input-area">
+            <div className="attach-area" {...getRootProps()}>
+              <input {...getInputProps()} />
+              {previewUrl ? (
+                <div className="attach-preview">
+                  <img src={previewUrl} alt="preview" />
+                  <button className="attach-remove" onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setPreviewUrl(''); }}>✕</button>
+                </div>
+              ) : (
+                <div className={`attach-placeholder ${isDragActive ? 'active' : ''}`} title="Attach image">📎</div>
+              )}
+            </div>
+
             <textarea
               ref={inputRef}
               id="plant-care-input"
@@ -324,7 +557,7 @@ function PlantCare() {
               id="plant-care-send"
               className={`chat-send-btn ${isStreaming ? 'loading' : ''}`}
               onClick={handleSend}
-              disabled={!input.trim() || isStreaming}
+              disabled={isStreaming || (!input.trim() && !selectedFile)}
               aria-label="Send message"
             >
               <Send size={20} />

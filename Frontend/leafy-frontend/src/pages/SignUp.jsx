@@ -178,7 +178,7 @@ function SignUp() {
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <div className="input-wrapper">
-                <Lock size={18} className="input-icon" />
+                {/* <Lock size={18} className="input-icon" /> */}
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -201,7 +201,7 @@ function SignUp() {
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <div className="input-wrapper">
-                <Lock size={18} className="input-icon" />
+                {/* <Lock size={18} className="input-icon" /> */}
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
