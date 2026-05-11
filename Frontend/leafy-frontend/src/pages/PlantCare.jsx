@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Leaf, RotateCcw, Bot, User, AlertCircle } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
 import '../styles/PlantCare.css';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -163,9 +162,11 @@ function PlantCare() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosis, setDiagnosis] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
   const chatBoxRef = useRef(null);
   const inputRef = useRef(null);
   const abortRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Scroll only the chat box, not the whole page
   useEffect(() => {
@@ -184,15 +185,25 @@ function PlantCare() {
     };
   }, [previewUrl]);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    const file = acceptedFiles && acceptedFiles[0];
+  const handleFileSelect = useCallback((file) => {
     if (!file) return;
+    if (!file.type?.startsWith('image/')) return;
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
-    // Do not auto-analyze on drop — analysis happens when user presses Send
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { 'image/*': [] }, maxFiles: 1 });
+  const onFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    handleFileSelect(file);
+    e.target.value = '';
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setIsDragActive(false);
+    const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+    handleFileSelect(file);
+  };
 
   const uploadImage = async (file) => {
     setIsAnalyzing(true);
@@ -530,8 +541,30 @@ function PlantCare() {
 
           {/* Input */}
           <div className="chat-input-area">
-            <div className="attach-area" {...getRootProps()}>
-              <input {...getInputProps()} />
+            <div
+              className="attach-area"
+              onClick={() => fileInputRef.current?.click()}
+              onDragEnter={(e) => {
+                e.preventDefault();
+                setIsDragActive(true);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragActive(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setIsDragActive(false);
+              }}
+              onDrop={onDrop}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                style={{ display: 'none' }}
+              />
               {previewUrl ? (
                 <div className="attach-preview">
                   <img src={previewUrl} alt="preview" />

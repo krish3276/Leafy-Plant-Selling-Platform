@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -17,41 +17,43 @@ import SignUp from './pages/SignUp';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 
-function App() {
+function CustomerLayout() {
   return (
     <>
-      <Routes>
-        {/* Admin Routes - No Navbar/Footer */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-        {/* Customer Routes - With Navbar/Footer */}
-        <Route
-          path="*"
-          element={
-            <>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/shop/:category" element={<Shop />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/plant-care" element={<PlantCare />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-              </Routes>
-              <Footer />
-            </>
-          }
-        />
-      </Routes>
+      <Navbar />
+      <Outlet />
+      <Footer />
     </>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      {/* Admin Routes - No Navbar/Footer */}
+      <Route path="admin/login" element={<AdminLogin />} />
+      <Route path="admin/dashboard" element={<AdminDashboard />} />
+
+      {/* Customer Routes - With Navbar/Footer */}
+      <Route path="/" element={<CustomerLayout />}>
+        <Route index element={<Home />} />
+        <Route path="shop" element={<Shop />} />
+        <Route path="shop/:category" element={<Shop />} />
+        <Route path="product/:id" element={<ProductDetail />} />
+        <Route path="plant-care" element={<PlantCare />} />
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
+        <Route path="cart" element={<Cart />} />
+        <Route path="checkout" element={<Checkout />} />
+        <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />
+        <Route path="account" element={<Account />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+      </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
