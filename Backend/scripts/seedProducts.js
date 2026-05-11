@@ -168,16 +168,16 @@ async function seedDatabase() {
   try {
     await connectDB();
     
-    console.log('🗑️  Clearing existing products...');
+    // console.log('🗑️  Clearing existing products...');
     await Product.deleteMany({});
     
-    console.log('🌱 Seeding products...');
+    // console.log('🌱 Seeding products...');
     const products = await Product.insertMany(sampleProducts);
     
-    console.log(`✅ Successfully seeded ${products.length} products!`);
-    console.log('\nSample Products:');
+    // console.log(`✅ Successfully seeded ${products.length} products!`);
+    // console.log('\nSample Products:');
     products.forEach(product => {
-      console.log(`  - ${product.name} (${product.category}) - ₹${product.price / 100}`);
+      // console.log(`  - ${product.name} (${product.category}) - ₹${product.price / 100}`);
     });
     
     process.exit(0);

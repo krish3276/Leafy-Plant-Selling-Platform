@@ -268,6 +268,125 @@ export const authAPI = {
 
     return await response.json();
   },
+
+  addToWishlist: async (productId) => {
+    const response = await fetch(`${API_BASE_URL}/auth/wishlist/${productId}`, {
+      method: 'POST',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add to wishlist');
+    }
+
+    return await response.json();
+  },
+};
+
+// ==================== GARDEN APIs ====================
+
+export const gardenAPI = {
+  getGarden: async () => {
+    const response = await fetch(`${API_BASE_URL}/garden`, {
+      method: 'GET',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch garden');
+    }
+
+    return await response.json();
+  },
+
+  addToGarden: async (productId, payload = {}) => {
+    const response = await fetch(`${API_BASE_URL}/garden`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify({ productId, ...payload }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add plant to garden');
+    }
+
+    return await response.json();
+  },
+
+  moveWishlistToGarden: async (productId) => {
+    const response = await fetch(`${API_BASE_URL}/garden/from-wishlist/${productId}`, {
+      method: 'POST',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to move plant to garden');
+    }
+
+    return await response.json();
+  },
+
+  updateGardenPlant: async (gardenPlantId, payload) => {
+    const response = await fetch(`${API_BASE_URL}/garden/${gardenPlantId}`, {
+      method: 'PUT',
+      headers: createHeaders(true),
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update garden plant');
+    }
+
+    return await response.json();
+  },
+
+  logCareAction: async (gardenPlantId, action) => {
+    const response = await fetch(`${API_BASE_URL}/garden/${gardenPlantId}/care`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify({ action }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to log care action');
+    }
+
+    return await response.json();
+  },
+
+  addNote: async (gardenPlantId, text) => {
+    const response = await fetch(`${API_BASE_URL}/garden/${gardenPlantId}/notes`, {
+      method: 'POST',
+      headers: createHeaders(true),
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add note');
+    }
+
+    return await response.json();
+  },
+
+  deleteGardenPlant: async (gardenPlantId) => {
+    const response = await fetch(`${API_BASE_URL}/garden/${gardenPlantId}`, {
+      method: 'DELETE',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to remove plant from garden');
+    }
+
+    return await response.json();
+  },
 };
 
 // ==================== CART APIs ====================
@@ -384,6 +503,21 @@ export const orderAPI = {
 
     if (!response.ok) {
       throw new Error('Failed to fetch order');
+    }
+
+    return await response.json();
+  },
+
+  // Track order
+  trackOrder: async (orderId) => {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}/track`, {
+      method: 'GET',
+      headers: createHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to track order');
     }
 
     return await response.json();

@@ -1,11 +1,22 @@
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import { syncGardenPlantsFromOrder } from './gardenController.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
   try {
     const { shippingAddress, paymentMethod, notes } = req.body;
+
+    const normalizedPaymentMethod = paymentMethod === 'cod' ? 'cod' : 'card';
+    const trimmedNotes = typeof notes === 'string' ? notes.trim() : '';
+
+    if (trimmedNotes.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: 'Notes cannot exceed 500 characters',
+      });
+    }
 
     // Get user with cart
     const user = await User.findById(req.user.id).populate('cart.productId');
@@ -40,9 +51,19 @@ export const createOrder = async (req, res) => {
 
     for (const cartItem of user.cart) {
       const product = cartItem.productId;
-      
+
       if (!product) {
-        continue;
+        return res.status(400).json({
+          success: false,
+          message: 'One or more products in your cart are no longer available',
+        });
+      }
+
+      if (!cartItem.quantity || cartItem.quantity < 1) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid quantity for ${product.name}`,
+        });
       }
 
       // Check stock
@@ -56,6 +77,7 @@ export const createOrder = async (req, res) => {
       orderItems.push({
         product: product._id,
         name: product.name,
+        category: product.category,
         price: product.price,
         quantity: cartItem.quantity,
         image: product.image,
@@ -77,19 +99,37 @@ export const createOrder = async (req, res) => {
     const total = subtotal + tax + shippingCost;
 
     // Create order
-    const order = await Order.create({
+    const orderPayload = {
       user: req.user.id,
       items: orderItems,
-      shippingAddress,
-      paymentMethod: paymentMethod || 'card',
+      shippingAddress: {
+        fullName: shippingAddress.fullName.trim(),
+        address: shippingAddress.address.trim(),
+        city: shippingAddress.city.trim(),
+        state: shippingAddress.state.trim(),
+        zipCode: shippingAddress.zipCode.trim(),
+        phone: shippingAddress.phone.trim(),
+      },
+      paymentMethod: normalizedPaymentMethod,
       subtotal,
       tax,
       shippingCost,
       total,
-      notes,
+      notes: trimmedNotes || undefined,
       orderStatus: 'confirmed',
-      paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
-    });
+      paymentStatus: normalizedPaymentMethod === 'cod' ? 'pending' : 'paid',
+    };
+
+    let order;
+    try {
+      order = await Order.create(orderPayload);
+    } catch (createError) {
+      if (createError.code === 11000) {
+        order = await Order.create({ ...orderPayload });
+      } else {
+        throw createError;
+      }
+    }
 
     // Update product stock
     for (const item of orderItems) {
@@ -180,6 +220,89 @@ export const getOrderById = async (req, res) => {
   }
 };
 
+// Track order (customer view)
+export const trackOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    })
+      .populate('items.product', 'name image')
+      .populate('user', 'firstName lastName email');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    const trackingSteps = [
+      { key: 'confirmed', label: 'Order Confirmed' },
+      { key: 'processing', label: 'Processing' },
+      { key: 'shipped', label: 'Shipped' },
+      { key: 'delivered', label: 'Delivered' },
+    ];
+
+    const currentStepIndex = trackingSteps.findIndex((step) => step.key === order.orderStatus);
+    const safeCurrentStepIndex = currentStepIndex === -1 ? 0 : currentStepIndex;
+    const isCancelled = order.orderStatus === 'cancelled';
+
+    const estimatedDeliveryDate = (() => {
+      if (order.orderStatus === 'delivered') {
+        return order.deliveredAt || order.updatedAt;
+      }
+
+      if (isCancelled) {
+        return null;
+      }
+
+      const startDate = new Date(order.createdAt);
+      const deliveryOffsetDays = order.orderStatus === 'shipped' ? 2 : 5;
+      startDate.setDate(startDate.getDate() + deliveryOffsetDays);
+      return startDate;
+    })();
+
+    const tracking = {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentStatus,
+      currentStep: isCancelled ? 'Cancelled' : trackingSteps[safeCurrentStepIndex].label,
+      currentStepIndex: isCancelled ? -1 : safeCurrentStepIndex,
+      totalSteps: trackingSteps.length,
+      progress: isCancelled ? 0 : Math.round(((safeCurrentStepIndex + 1) / trackingSteps.length) * 100),
+      estimatedDeliveryDate,
+      canCancel: ['pending', 'confirmed'].includes(order.orderStatus),
+      timestamps: {
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        deliveredAt: order.deliveredAt || null,
+        cancelledAt: order.cancelledAt || null,
+      },
+      steps: trackingSteps.map((step, index) => ({
+        key: step.key,
+        label: step.label,
+        completed: !isCancelled && index <= safeCurrentStepIndex,
+        active: !isCancelled && index === safeCurrentStepIndex,
+      })),
+    };
+
+    res.status(200).json({
+      success: true,
+      order,
+      tracking,
+    });
+  } catch (error) {
+    console.error('Track Order Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
 // Cancel order (only if pending or confirmed)
 export const cancelOrder = async (req, res) => {
   try {
@@ -231,11 +354,32 @@ export const cancelOrder = async (req, res) => {
 // Admin: Get all orders
 export const getAllOrders = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
+    const {
+      status,
+      paymentStatus,
+      search,
+      page = 1,
+      limit = 20,
+    } = req.query;
 
     const query = {};
     if (status) {
       query.orderStatus = status;
+    }
+
+    if (paymentStatus) {
+      query.paymentStatus = paymentStatus;
+    }
+
+    if (search) {
+      query.$or = [
+        { orderNumber: { $regex: search, $options: 'i' } },
+        { 'shippingAddress.fullName': { $regex: search, $options: 'i' } },
+        { 'shippingAddress.phone': { $regex: search, $options: 'i' } },
+        { 'shippingAddress.address': { $regex: search, $options: 'i' } },
+        { 'shippingAddress.city': { $regex: search, $options: 'i' } },
+        { 'items.name': { $regex: search, $options: 'i' } },
+      ];
     }
 
     const orders = await Order.find(query)
@@ -246,6 +390,53 @@ export const getAllOrders = async (req, res) => {
       .populate('items.product', 'name');
 
     const total = await Order.countDocuments(query);
+    const summaryResult = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          pendingOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'pending'] }, 1, 0] },
+          },
+          confirmedOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'confirmed'] }, 1, 0] },
+          },
+          processingOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'processing'] }, 1, 0] },
+          },
+          shippedOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'shipped'] }, 1, 0] },
+          },
+          deliveredOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'delivered'] }, 1, 0] },
+          },
+          cancelledOrders: {
+            $sum: { $cond: [{ $eq: ['$orderStatus', 'cancelled'] }, 1, 0] },
+          },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $ne: ['$orderStatus', 'cancelled'] },
+                '$total',
+                0,
+              ],
+            },
+          },
+        },
+      },
+    ]);
+
+    const summary = summaryResult[0] || {
+      totalOrders: 0,
+      pendingOrders: 0,
+      confirmedOrders: 0,
+      processingOrders: 0,
+      shippedOrders: 0,
+      deliveredOrders: 0,
+      cancelledOrders: 0,
+      totalRevenue: 0,
+    };
 
     res.status(200).json({
       success: true,
@@ -253,6 +444,7 @@ export const getAllOrders = async (req, res) => {
       total,
       totalPages: Math.ceil(total / limit),
       currentPage: parseInt(page),
+      summary,
       orders,
     });
   } catch (error) {
@@ -280,9 +472,22 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     if (orderStatus) {
+      const wasDelivered = order.orderStatus === 'delivered';
       order.orderStatus = orderStatus;
       if (orderStatus === 'delivered') {
         order.deliveredAt = new Date();
+      } else {
+        order.deliveredAt = null;
+      }
+
+      if (orderStatus === 'cancelled') {
+        order.cancelledAt = new Date();
+      } else {
+        order.cancelledAt = null;
+      }
+
+      if (!wasDelivered && orderStatus === 'delivered') {
+        await syncGardenPlantsFromOrder(order.user, order);
       }
     }
 

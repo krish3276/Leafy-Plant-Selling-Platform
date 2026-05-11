@@ -78,6 +78,11 @@
   color: #2d5f3f;
 }
 
+.nav-link.active {
+  color: #2d5f3f;
+  font-weight: 600;
+}
+
 .nav-dropdown {
   position: relative;
 }
@@ -261,28 +266,368 @@
   box-shadow: 0 2px 8px rgba(45, 95, 63, 0.2);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Hamburger Menu Button */
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  transition: color 0.3s;
+}
+
+.hamburger-menu:hover {
+  color: #2d5f3f;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  display: none;
+  background-color: white;
+  border-top: 1px solid #e5e5e5;
+  padding: 1rem 0;
+  animation: slideDown 0.3s ease-out;
+}
+
+.mobile-menu-content {
+  padding: 0 1rem;
+}
+
+.mobile-nav-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.mobile-nav-link:hover {
+  background-color: #f5f5f5;
+  color: #2d5f3f;
+  padding-left: 1.5rem;
+}
+
+.mobile-nav-link.active {
+  color: #2d5f3f;
+  background-color: #f0f7f3;
+  font-weight: 600;
+}
+
+.mobile-nav-dropdown {
+  position: relative;
+}
+
+.mobile-dropdown-content {
+  display: none;
+  background-color: #fafafa;
+  border-left: 3px solid #2d5f3f;
+  margin-top: 0.5rem;
+}
+
+.mobile-dropdown-content a {
+  display: block;
+  padding: 0.5rem 1rem 0.5rem 1.5rem;
+  text-decoration: none;
+  color: #666;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.mobile-dropdown-content a:hover {
+  background-color: #f0f0f0;
+  color: #2d5f3f;
+  padding-left: 2rem;
+}
+
+.mobile-nav-dropdown:hover .mobile-dropdown-content {
+  display: block;
+}
+
+/* Search Toggle for Mobile */
+.search-toggle-mobile {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 0;
+  transition: color 0.3s;
+}
+
+.search-toggle-mobile:hover {
+  color: #2d5f3f;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - TABLET & SMALLER
+   ============================================ */
+
+/* Tablet (768px and below) */
+@media (max-width: 1024px) {
   .navbar-container {
     gap: 1rem;
-    padding: 0 1rem;
   }
 
   .search-container {
-    max-width: 250px;
+    max-width: 240px;
+    flex: 0.8;
   }
 
   .nav-links {
-    gap: 1rem;
-  }
-
-  .navbar-icons {
     gap: 1rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .navbar-container {
+    gap: 0.75rem;
+    padding: 0 1rem;
+    flex-wrap: wrap;
+  }
+
+  .navbar-logo {
+    font-size: 1.3rem;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .search-container {
+    max-width: 200px;
+    flex: 1;
+    min-width: 150px;
+    order: 3;
+  }
+
+  .search-input {
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .search-icon {
+    right: 0.8rem;
+  }
+
   .nav-links {
     display: none;
+  }
+
+  .navbar-icons {
+    gap: 0.8rem;
+    order: 2;
+  }
+
+  .icon-link {
+    padding: 0.4rem;
+  }
+
+  .admin-link {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .hamburger-menu {
+    display: block;
+  }
+
+  .mobile-menu {
+    order: 4;
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+}
+
+/* Mobile (576px and below) */
+@media (max-width: 576px) {
+  .navbar {
+    padding: 0.75rem 0;
+  }
+
+  .navbar-container {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .navbar-logo {
+    font-size: 1.2rem;
+    order: 1;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .search-container {
+    order: 2;
+    width: 100%;
+    max-width: none;
+    margin-top: 0.5rem;
+    flex-basis: 100%;
+  }
+
+  .search-container.active {
+    display: flex;
+  }
+
+  .search-input {
+    padding: 0.6rem 0.8rem 0.6rem 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .search-icon {
+    right: 0.7rem;
+    width: 18px;
+    height: 18px;
+  }
+
+  .navbar-icons {
+    order: 3;
+    width: 100%;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0 0;
+  }
+
+  .search-toggle-mobile {
+    display: block;
+  }
+
+  .icon-link {
+    padding: 0.3rem;
+  }
+
+  .icon-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .admin-link {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    padding: 0.3rem;
+  }
+
+  .cart-badge {
+    font-size: 0.6rem;
+    min-width: 16px;
+    height: 16px;
+    top: -6px;
+    right: -6px;
+  }
+
+  .hamburger-menu {
+    margin-left: 0.25rem;
+    padding: 0.3rem;
+  }
+
+  .hamburger-menu svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobile-menu {
+    order: 4;
+    max-height: 70vh;
+    overflow-y: auto;
+    width: 100%;
+  }
+
+  .mobile-menu-content {
+    padding: 0 0.5rem;
+  }
+
+  .mobile-nav-link {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .mobile-nav-link:hover {
+    padding-left: 1.25rem;
+  }
+
+  .mobile-dropdown-content a {
+    padding: 0.45rem 0.75rem 0.45rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .mobile-dropdown-content a:hover {
+    padding-left: 1.75rem;
+  }
+}
+
+/* Extra Small Devices (360px and below - iPhone SE, etc.) */
+@media (max-width: 360px) {
+  .navbar-container {
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .navbar-logo {
+    font-size: 1.1rem;
+    min-width: auto;
+  }
+
+  .logo-icon {
+    font-size: 1.3rem;
+  }
+
+  .search-container {
+    margin-top: 0.25rem;
+  }
+
+  .navbar-icons {
+    gap: 0.25rem;
+  }
+
+  .icon-link svg,
+  .search-toggle-mobile svg,
+  .hamburger-menu svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .admin-link {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .mobile-nav-link {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .mobile-nav-link:hover {
+    padding-left: 1rem;
+  }
+}
+
+/* Large Desktop (1400px and above) */
+@media (min-width: 1400px) {
+  .navbar-container {
+    padding: 0 3rem;
   }
 }

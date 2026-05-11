@@ -4,6 +4,7 @@ import {
   login,
   getProfile,
   updateProfile,
+  addToWishlist,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import {
@@ -71,6 +72,7 @@ router.post('/login', loginValidation, login);
  * }
  */
 router.get('/profile', protect, getProfile);
+router.post('/wishlist/:productId', protect, addToWishlist);
 
 /**
  * 🔄 ROUTE: PUT /api/auth/profile

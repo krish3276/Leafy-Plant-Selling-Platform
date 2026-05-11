@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
 
+const generateOrderNumber = () => {
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  return `LF${year}${month}${day}${timestamp}${random}`;
+};
+
 const orderSchema = new mongoose.Schema(
   {
     user: {
@@ -12,6 +23,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
       required: true,
+      default: generateOrderNumber,
     },
 
     items: [
@@ -22,6 +34,7 @@ const orderSchema = new mongoose.Schema(
           required: true,
         },
         name: String,
+        category: String,
         price: Number,
         quantity: {
           type: Number,
@@ -109,18 +122,6 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// Generate unique order number
-orderSchema.pre('save', async function (next) {
-  if (!this.orderNumber) {
-    const date = new Date();
-    const year = date.getFullYear().toString().slice(-2);
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    this.orderNumber = `LF${year}${month}${random}`;
-  }
-  next();
-});
 
 const Order = mongoose.model('Order', orderSchema);
 

@@ -60,7 +60,7 @@ function makeRequest(url, method = 'GET', data = null, headers = {}) {
 
 const testAdminDashboard = async () => {
   try {
-    console.log('🔒 Step 1: Getting JWT Token...\n');
+    // console.log('🔒 Step 1: Getting JWT Token...\n');
 
     // First, get a valid JWT token
     const loginResponse = await makeRequest('http://localhost:5000/api/auth/login', 'POST', {
@@ -74,25 +74,25 @@ const testAdminDashboard = async () => {
     }
 
     const token = loginResponse.body.token;
-    console.log('✅ Token received!\n');
+    // console.log('✅ Token received!\n');
 
-    console.log('📊 Step 2: Testing Dashboard Endpoint...\n');
+    // console.log('📊 Step 2: Testing Dashboard Endpoint...\n');
 
     // Now test the dashboard endpoint with the token
     const dashboardResponse = await makeRequest('http://localhost:5000/api/admin/dashboard', 'GET', null, {
       'Authorization': `Bearer ${token}`,
     });
 
-    console.log(`📊 Response Status: ${dashboardResponse.status} ${dashboardResponse.statusText}\n`);
+    // console.log(`📊 Response Status: ${dashboardResponse.status} ${dashboardResponse.statusText}\n`);
 
     if (dashboardResponse.status === 200) {
-      console.log('✅ DASHBOARD ENDPOINT WORKING!\n');
+      // console.log('✅ DASHBOARD ENDPOINT WORKING!\n');
       console.log('📈 Dashboard Data:');
       console.log(JSON.stringify(dashboardResponse.body.dashboard, null, 2));
     } else {
-      console.log('❌ DASHBOARD ENDPOINT FAILED!\n');
-      console.log('Error:', dashboardResponse.body.message);
-      console.log('Full Response:', JSON.stringify(dashboardResponse.body, null, 2));
+      // console.log('❌ DASHBOARD ENDPOINT FAILED!\n');
+      // console.log('Error:', dashboardResponse.body.message);
+      // console.log('Full Response:', JSON.stringify(dashboardResponse.body, null, 2));
     }
 
     process.exit(0);
