@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { Search, ShoppingCart, Loader2 } from 'lucide-react';
 import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
 function Shop() {
   const navigate = useNavigate();
+  const { category } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,6 +22,13 @@ function Shop() {
   useEffect(() => {
     fetchProducts();
   }, [filters]);
+
+  // Sync filters.category with the URL param when route changes
+  useEffect(() => {
+    // category will be undefined on /shop route, so normalize to empty string
+    const routeCategory = category || '';
+    setFilters((prev) => (prev.category === routeCategory ? prev : { ...prev, category: routeCategory }));
+  }, [category]);
 
   const fetchProducts = async () => {
     try {
@@ -40,7 +48,14 @@ function Shop() {
   };
 
   const handleCategoryChange = (category) => {
-    setFilters({ ...filters, category: category === filters.category ? '' : category });
+    const newCategory = category === filters.category ? '' : category;
+    setFilters({ ...filters, category: newCategory });
+    // Keep URL in sync with selected category
+    if (newCategory) {
+      navigate(`/shop/${newCategory}`);
+    } else {
+      navigate('/shop');
+    }
   };
 
   const handleSearchChange = (e) => {

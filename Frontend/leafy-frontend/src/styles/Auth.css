@@ -90,7 +90,7 @@
 
 .input-icon {
   position: absolute;
-  left: 0.9rem;
+  right: 0.9rem;
   color: #999;
   pointer-events: none;
   flex-shrink: 0;
