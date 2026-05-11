@@ -3,6 +3,7 @@ import {
   BarChart3,
   Users,
   Package,
+  ShoppingCart,
   AlertTriangle,
   Settings,
   LogOut,
@@ -24,6 +25,11 @@ function AdminSidebar({ activeTab, setActiveTab, sidebarOpen, user }) {
       id: 'products',
       icon: <Package size={20} />,
       label: 'Products',
+    },
+    {
+      id: 'orders',
+      icon: <ShoppingCart size={20} />,
+      label: 'Orders',
     },
     {
       id: 'users',

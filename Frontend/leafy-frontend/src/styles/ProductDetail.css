@@ -390,6 +390,17 @@
   color: #e91e63;
 }
 
+.wishlist-btn.active {
+  border-color: #e91e63;
+  color: #e91e63;
+  background: #fff0f5;
+}
+
+.wishlist-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
 /* Shipping Info */
 .shipping-info {
   display: flex;

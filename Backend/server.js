@@ -8,6 +8,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import gardenRoutes from './routes/gardenRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 
 dotenv.config();
@@ -57,6 +58,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/garden', gardenRoutes);
 app.use('/api/chat', chatRoutes);
 
 app.use((req, res) => {

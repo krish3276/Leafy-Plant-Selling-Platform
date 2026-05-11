@@ -13,6 +13,7 @@ import '../styles/AdminDashboard.css';
 import AdminSidebar from '../components/Admin/AdminSidebar';
 import AdminStats from '../components/Admin/AdminStats';
 import ProductManagement from '../components/Admin/ProductManagement';
+import OrdersManagement from '../components/Admin/OrdersManagement';
 import UserManagement from '../components/Admin/UserManagement';
 import AdminSettings from '../components/Admin/AdminSettings';
 import AdminNotifications from '../components/Admin/AdminNotifications';
@@ -164,6 +165,14 @@ function AdminDashboard() {
             <div className="admin-tab-content">
               <h1 className="admin-page-title">Product Management</h1>
               <ProductManagement />
+            </div>
+          )}
+
+          {/* Orders Tab */}
+          {activeTab === 'orders' && (
+            <div className="admin-tab-content">
+              <h1 className="admin-page-title">Order Management</h1>
+              <OrdersManagement />
             </div>
           )}
 

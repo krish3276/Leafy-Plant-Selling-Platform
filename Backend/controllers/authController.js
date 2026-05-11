@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Product from '../models/Product.js';
 import { validationResult } from 'express-validator';
 
 export const signup = async (req, res) => {
@@ -134,7 +135,9 @@ export const login = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id)
+      .select('-password')
+      .populate('wishlist', 'name image price category stock isActive');
 
     if (!user) {
       return res.status(404).json({
@@ -149,6 +152,64 @@ export const getProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Get Profile Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+export const addToWishlist = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    if (!product.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product is no longer available',
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const alreadySaved = user.wishlist.some(
+      (savedProductId) => savedProductId.toString() === productId
+    );
+
+    if (!alreadySaved) {
+      user.wishlist.push(productId);
+      await user.save();
+    }
+
+    const updatedUser = await User.findById(req.user.id)
+      .select('-password')
+      .populate('wishlist', 'name image price category stock isActive');
+
+    res.status(200).json({
+      success: true,
+      message: alreadySaved ? 'Product is already in wishlist' : 'Product added to wishlist',
+      wishlist: updatedUser.wishlist,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error('Add Wishlist Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',

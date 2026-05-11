@@ -15,7 +15,7 @@ import {
   Shield,
   RotateCcw,
 } from 'lucide-react';
-import { productAPI, cartAPI } from '../utils/api';
+import { authAPI, productAPI, cartAPI } from '../utils/api';
 import '../styles/ProductDetail.css';
 
 function ProductDetail() {
@@ -26,11 +26,36 @@ function ProductDetail() {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [addingToWishlist, setAddingToWishlist] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    const syncWishlistState = async () => {
+      const token = localStorage.getItem('authToken');
+
+      if (!token || !product) {
+        setIsWishlisted(false);
+        return;
+      }
+
+      try {
+        const response = await authAPI.getProfile();
+        const wishlist = response.user?.wishlist || [];
+        setIsWishlisted(
+          wishlist.some((item) => item._id === product._id || item === product._id)
+        );
+      } catch (error) {
+        console.error('Error syncing wishlist state:', error);
+      }
+    };
+
+    syncWishlistState();
+  }, [product]);
 
   const fetchProduct = async () => {
     try {
@@ -82,6 +107,43 @@ function ProductDetail() {
       showNotification(err.message || 'Failed to add to cart', 'error');
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const addToWishlist = async () => {
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+      showNotification('Please log in to save items to your wishlist', 'error');
+      setTimeout(() => navigate('/login'), 1500);
+      return;
+    }
+
+    if (isWishlisted) {
+      showNotification('This plant is already in your wishlist', 'success');
+      return;
+    }
+
+    setAddingToWishlist(true);
+    try {
+      const response = await authAPI.addToWishlist(product._id);
+      if (response.success) {
+        setIsWishlisted(true);
+        showNotification(response.message || 'Added to wishlist!', 'success');
+        const profileResponse = await authAPI.getProfile();
+        if (profileResponse.success && profileResponse.user) {
+          const normalizedUser = {
+            ...profileResponse.user,
+            name: `${profileResponse.user.firstName || ''} ${profileResponse.user.lastName || ''}`.trim(),
+          };
+          localStorage.setItem('user', JSON.stringify(normalizedUser));
+        }
+      }
+    } catch (err) {
+      console.error('Error adding to wishlist:', err);
+      showNotification(err.message || 'Failed to add to wishlist', 'error');
+    } finally {
+      setAddingToWishlist(false);
     }
   };
 
@@ -273,8 +335,13 @@ function ProductDetail() {
                 : 'Add to Cart'}
             </button>
 
-            <button className="wishlist-btn" title="Add to Wishlist">
-              <Heart size={20} />
+            <button
+              className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
+              title={isWishlisted ? 'Added to Wishlist' : 'Add to Wishlist'}
+              onClick={addToWishlist}
+              disabled={addingToWishlist}
+            >
+              <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
             </button>
           </div>
 
