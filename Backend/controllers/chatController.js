@@ -129,7 +129,7 @@ export const analyzeImage = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Image file is required.' });
     }
 
-    console.log('[analyzeImage] Image received:', { size: file.size, type: file.mimetype });
+    // console.log('[analyzeImage] Image received:', { size: file.size, type: file.mimetype });
 
     // Get Gemini AI instance
     let ai;
@@ -169,7 +169,7 @@ export const analyzeImage = async (req, res) => {
 
     for (const modelName of visionModels) {
       try {
-        console.log(`[analyzeImage] Trying model: ${modelName}`);
+        // console.log(`[analyzeImage] Trying model: ${modelName}`);
         const model = ai.getGenerativeModel({ model: modelName });
 
         const result = await model.generateContent([
@@ -224,7 +224,7 @@ export const analyzeImage = async (req, res) => {
           analysis: String(parsed.analysis || '').substring(0, 500),
         };
 
-        console.log(`[analyzeImage] ✅ ${modelName} succeeded`);
+        // console.log(`[analyzeImage] ✅ ${modelName} succeeded`);
         successResponse = { success: true, data: normalized, model: modelName };
         return res.json(successResponse);
       } catch (err) {
@@ -236,7 +236,7 @@ export const analyzeImage = async (req, res) => {
         console.warn(`[analyzeImage] ${modelName} failed:`, errMsg.substring(0, 100));
 
         if (is429 || is404) {
-          console.log(`[analyzeImage] ${modelName} unavailable, trying next...`);
+          // console.log(`[analyzeImage] ${modelName} unavailable, trying next...`);
           continue;
         }
         // Continue trying other models on other errors too
@@ -244,7 +244,7 @@ export const analyzeImage = async (req, res) => {
     }
 
     // All API models failed - use mock fallback
-    console.log('[analyzeImage] ℹ️ All API models exhausted, using intelligent mock analysis');
+    // console.log('[analyzeImage] ℹ️ All API models exhausted, using intelligent mock analysis');
     const mockData = getMockAnalysis();
     
     return res.json({
@@ -287,7 +287,7 @@ export const chat = async (req, res) => {
       console.error('[chat] Gemini API key error:', keyErr.message);
       // Dev mode fallback for chat
       if (process.env.NODE_ENV !== 'production') {
-        console.log('[chat] Using mock response (dev mode)');
+        // console.log('[chat] Using mock response (dev mode)');
         const mockResponse = 'That sounds like a great plant care question! Based on what you\'ve described, I\'d recommend increasing humidity to 60-70% and watering when the top inch of soil is dry. Make sure your plant has bright, indirect light and keep temperatures between 65-75°F. Is there anything specific about watering or sunlight you\'d like to know more about?';
         res.write(`data: ${JSON.stringify({ text: mockResponse })}\n\n`);
         res.write('data: [DONE]\n\n');
@@ -309,7 +309,7 @@ export const chat = async (req, res) => {
     let lastError = null;
     for (const modelName of MODEL_FALLBACKS) {
       try {
-        console.log(`[chat] Trying model: ${modelName}`);
+        // console.log(`[chat] Trying model: ${modelName}`);
         const model = ai.getGenerativeModel({
           model: modelName,
           systemInstruction: SYSTEM_PROMPT,
@@ -324,7 +324,7 @@ export const chat = async (req, res) => {
         const is404 = err.message && err.message.includes('404');
         console.warn(`[chat] Model ${modelName} failed: ${err.message?.substring(0, 100)}`);
         if (is429 || is404) {
-          console.log(`[chat] Model ${modelName} unavailable (${is429 ? '429 quota' : '404'}), trying next...`);
+          // console.log(`[chat] Model ${modelName} unavailable (${is429 ? '429 quota' : '404'}), trying next...`);
           continue;
         }
         throw err;
@@ -334,7 +334,7 @@ export const chat = async (req, res) => {
     // All models failed - check if it's a quota error and use mock in dev mode
     if (lastError && (lastError.message.includes('429') || lastError.message.includes('quota'))) {
       if (process.env.NODE_ENV !== 'production') {
-        console.log('[chat] All models quota exceeded, using mock response (dev mode)');
+        // console.log('[chat] All models quota exceeded, using mock response (dev mode)');
         const mockResponse = `Based on the plant analysis provided, here are my recommendations:
 
 1. **Immediate Action**: Address any urgent issues first. The health score indicates the plant needs attention.

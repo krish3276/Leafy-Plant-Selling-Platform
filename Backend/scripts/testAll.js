@@ -31,29 +31,29 @@ async function test(method, path, data = null) {
 }
 
 async function runTests() {
-  console.log('🔧 Testing Leafy Backend API\n');
+  // console.log('🔧 Testing Leafy Backend API\n');
 
   try {
     // Test 1: Health check
-    console.log('Test 1: Health Check');
+    // console.log('Test 1: Health Check');
     const health = await test('GET', '/api/health');
-    console.log(`Status: ${health.status}`);
-    console.log(`Response: ${JSON.stringify(health.body, null, 2)}\n`);
+      // console.log(`Status: ${health.status}`);
+      // console.log(`Response: ${JSON.stringify(health.body, null, 2)}\n`);
 
     // Test 2: Login
-    console.log('Test 2: Admin Login');
+    // console.log('Test 2: Admin Login');
     const login = await test('POST', '/api/auth/login', {
       email: 'admin@leafy.com',
       password: 'Admin@123456',
     });
-    console.log(`Status: ${login.status}`);
+    // console.log(`Status: ${login.status}`);
     
     if (login.body.success) {
-      console.log(`✅ Login successful!`);
-      console.log(`Token: ${login.body.token.substring(0, 50)}...\n`);
+      // console.log(`✅ Login successful!`);
+      // console.log(`Token: ${login.body.token.substring(0, 50)}...\n`);
 
       // Test 3: Dashboard with token
-      console.log('Test 3: Admin Dashboard');
+      // console.log('Test 3: Admin Dashboard');
       const dashboardOptions = {
         hostname: 'localhost',
         port: 5000,
@@ -81,17 +81,17 @@ async function runTests() {
         req.end();
       });
 
-      console.log(`Status: ${dashboard.status}`);
+      // console.log(`Status: ${dashboard.status}`);
       if (dashboard.status === 200) {
-        console.log(`✅ Dashboard endpoint working!`);
-        console.log(`Response: ${JSON.stringify(dashboard.body, null, 2)}`);
+        // console.log(`✅ Dashboard endpoint working!`);
+        // console.log(`Response: ${JSON.stringify(dashboard.body, null, 2)}`);
       } else {
-        console.log(`❌ Dashboard failed!`);
-        console.log(`Response: ${JSON.stringify(dashboard.body, null, 2)}`);
+        // console.log(`❌ Dashboard failed!`);
+        // console.log(`Response: ${JSON.stringify(dashboard.body, null, 2)}`);
       }
     } else {
-      console.log(`❌ Login failed!`);
-      console.log(`Response: ${JSON.stringify(login.body, null, 2)}`);
+      // console.log(`❌ Login failed!`);
+      // console.log(`Response: ${JSON.stringify(login.body, null, 2)}`);
     }
   } catch (error) {
     console.error('❌ Test Error:', error.message);

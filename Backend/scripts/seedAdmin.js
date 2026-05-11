@@ -14,20 +14,20 @@ dotenv.config();
 
 const createAdminAccount = async () => {
   try {
-    console.log('🔐 Starting Admin Account Creation...\n');
+    // console.log('🔐 Starting Admin Account Creation...\n');
 
     // Connect to database
     await connectDB();
-    console.log('✅ Connected to MongoDB\n');
+    // console.log('✅ Connected to MongoDB\n');
 
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email: 'admin@leafy.com' });
     
     if (existingAdmin) {
-      console.log('⚠️  Admin account already exists!');
-      console.log('📧 Email: admin@leafy.com');
-      console.log('🔑 Password: (already set)');
-      console.log('\n💡 To reset admin password, delete the existing admin user and run this script again.');
+      // console.log('⚠️  Admin account already exists!');
+      // console.log('📧 Email: admin@leafy.com');
+      // console.log('🔑 Password: (already set)');
+      // console.log('\n💡 To reset admin password, delete the existing admin user and run this script again.');
       process.exit(0);
     }
 
@@ -43,17 +43,13 @@ const createAdminAccount = async () => {
       address: 'Leafy Headquarters, India',
     });
 
-    console.log('✅ Admin Account Created Successfully!\n');
-    console.log('═════════════════════════════════════════════');
-    console.log('🎉 ADMIN LOGIN CREDENTIALS');
-    console.log('═════════════════════════════════════════════\n');
-    console.log('📧 Email:    admin@leafy.com');
-    console.log('🔑 Password: Admin@123456\n');
-    console.log('═════════════════════════════════════════════');
-    console.log('🌐 Admin Portal: http://localhost:5173/admin/login');
-    console.log('═════════════════════════════════════════════\n');
-    console.log('⚠️  IMPORTANT: Change the password after first login!');
-    console.log('💡 You can change it in Account Settings.\n');
+    // console.log('✅ Admin Account Created Successfully!\n');
+    // console.log('═════════════════════════════════════════════');
+    // console.log('🎉 ADMIN LOGIN CREDENTIALS');
+    // console.log('═════════════════════════════════════════════\n');
+    // console.log('📧 Email:    admin@leafy.com');
+    // console.log('🔑 Password: Admin@123456\n');
+    // console.log('═══
 
     process.exit(0);
   } catch (error) {

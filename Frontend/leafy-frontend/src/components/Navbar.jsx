@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { cartAPI } from '../utils/api';
 import './Navbar.css';
 
 function Navbar() {
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -82,18 +83,18 @@ function Navbar() {
 
         {/* Navigation Links - Hidden on mobile */}
         <div className="nav-links">
-          <Link to="/" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>Home</NavLink>
           <div className="nav-dropdown">
-            <Link to="/shop" className="nav-link">Shop</Link>
+            <NavLink to="/shop" className={({ isActive }) => `nav-link ${isActive || location.pathname.startsWith('/shop') ? 'active' : ''}`}>Shop</NavLink>
             <div className="dropdown-content">
               <Link to="/shop/indoor" onClick={() => setIsMobileMenuOpen(false)}>Indoor Plants</Link>
               <Link to="/shop/outdoor" onClick={() => setIsMobileMenuOpen(false)}>Outdoor Plants</Link>
               <Link to="/shop/succulents" onClick={() => setIsMobileMenuOpen(false)}>Succulents</Link>
             </div>
           </div>
-          <Link to="/plant-care" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Plant Care</Link>
-          <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-          <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+          <NavLink to="/plant-care" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>Plant Care</NavLink>
+          <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>About</NavLink>
+          <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>Contact</NavLink>
         </div>
 
         {/* Icons */}
@@ -134,11 +135,11 @@ function Navbar() {
       {isMobileMenuOpen && (
         <div className="mobile-menu">
           <div className="mobile-menu-content">
-            <Link to="/" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink to="/" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
               Home
-            </Link>
+            </NavLink>
             <div className="mobile-nav-dropdown">
-              <Link to="/shop" className="mobile-nav-link">Shop</Link>
+              <NavLink to="/shop" className={({ isActive }) => `mobile-nav-link ${isActive || location.pathname.startsWith('/shop') ? 'active' : ''}`}>Shop</NavLink>
               <div className="mobile-dropdown-content">
                 <Link to="/shop/indoor" onClick={() => setIsMobileMenuOpen(false)}>
                   Indoor Plants
@@ -151,15 +152,15 @@ function Navbar() {
                 </Link>
               </div>
             </div>
-            <Link to="/plant-care" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink to="/plant-care" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
               Plant Care
-            </Link>
-            <Link to="/about" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+            </NavLink>
+            <NavLink to="/about" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
               About
-            </Link>
-            <Link to="/contact" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+            </NavLink>
+            <NavLink to="/contact" className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
               Contact
-            </Link>
+            </NavLink>
           </div>
         </div>
       )}

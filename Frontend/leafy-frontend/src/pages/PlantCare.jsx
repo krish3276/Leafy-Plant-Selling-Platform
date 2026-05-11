@@ -197,26 +197,26 @@ function PlantCare() {
   const uploadImage = async (file) => {
     setIsAnalyzing(true);
     setDiagnosis(null);
-    console.log('[PlantCare] Starting image analysis...');
+    // console.log('[PlantCare] Starting image analysis...');
     try {
       const form = new FormData();
       form.append('image', file);
       form.append('message', input || '');
 
-      console.log('[PlantCare] Sending image to backend:', {
-        fileName: file?.name,
-        fileSize: file?.size,
-        fileType: file?.type,
-      });
+      // console.log('[PlantCare] Sending image to backend:', {
+      //   fileName: file?.name,
+      //   fileSize: file?.size,
+      //   fileType: file?.type,
+      // });
 
       const resp = await fetch(`${API_BASE_URL}/chat/analyze-image`, {
         method: 'POST',
         body: form,
       });
       
-      console.log('[PlantCare] Backend response status:', resp.status);
+      // console.log('[PlantCare] Backend response status:', resp.status);
       const json = await resp.json();
-      console.log('[PlantCare] Backend response:', json);
+      // console.log('[PlantCare] Backend response:', json);
 
       if (!resp.ok) {
         const errMsg = json?.error || json?.raw || json?.message || `Server error ${resp.status}`;
@@ -232,7 +232,7 @@ function PlantCare() {
       }
 
       const data = json.data;
-      console.log('[PlantCare] Analysis successful:', data);
+      // console.log('[PlantCare] Analysis successful:', data);
       setDiagnosis(data);
 
       // Create image preview URL
@@ -240,7 +240,7 @@ function PlantCare() {
 
       return { success: true, diagData: data, imageUrl };
     } catch (err) {
-      console.error('[PlantCare] Image analysis exception:', err);
+      // console.error('[PlantCare] Image analysis exception:', err);
       const errMsg = err.message || 'Analysis failed';
       setDiagnosis({ error: errMsg });
       return { success: false, error: errMsg };
@@ -255,24 +255,24 @@ function PlantCare() {
     if (!userTextRaw && !selectedFile) return;
     if (isStreaming) return;
 
-    console.log('[PlantCare] handleSend called with:', {
-      textLength: userTextRaw.length,
-      hasImage: !!selectedFile,
-      isAnalyzing,
-    });
+    // console.log('[PlantCare] handleSend called with:', {
+    //   textLength: userTextRaw.length,
+    //   hasImage: !!selectedFile,
+    //   isAnalyzing,
+    // });
 
     // If there's an attached image, analyze it first
     let diagData = null;
     let imageUrl = null;
     if (selectedFile && !isAnalyzing) {
-      console.log('[PlantCare] Analyzing attached image...');
+      //console.log('[PlantCare] Analyzing attached image...');
       const res = await uploadImage(selectedFile);
       diagData = res?.diagData;
       imageUrl = res?.imageUrl;
       // clear selection after analysis attempt
       setSelectedFile(null);
       setPreviewUrl('');
-      console.log('[PlantCare] Image analysis result:', { success: res?.success, hasError: !!res?.error });
+      // console.log('[PlantCare] Image analysis result:', { success: res?.success, hasError: !!res?.error });
     }
 
     const history = messages
@@ -311,7 +311,7 @@ function PlantCare() {
     // For API: send history + user message (diagnosis context embedded in user message)
     const apiMessages = [...history, { role: 'user', content: finalUserContent }];
 
-    console.log('[PlantCare] Sending chat message with history length:', history.length);
+    // console.log('[PlantCare] Sending chat message with history length:', history.length);
 
     try {
       const controller = new AbortController();
