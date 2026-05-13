@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Shield, Trash2, AlertCircle } from 'lucide-react';
 import './UserManagement.css';
 
-function UserManagement() {
+function UserManagement({ initialRoleFilter = '' }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -15,8 +15,21 @@ function UserManagement() {
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
+    // If an initial role filter is provided from parent, apply it
+    if (initialRoleFilter) {
+      setRoleFilter(initialRoleFilter);
+      setPage(1);
+    }
     fetchUsers();
   }, [page, roleFilter]);
+
+  // Update roleFilter if parent changes initialRoleFilter
+  useEffect(() => {
+    if (initialRoleFilter !== undefined) {
+      setRoleFilter(initialRoleFilter);
+      setPage(1);
+    }
+  }, [initialRoleFilter]);
 
   const fetchUsers = async () => {
     try {

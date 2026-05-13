@@ -25,6 +25,8 @@ function AdminDashboard() {
   const [error, setError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [userRoleFilter, setUserRoleFilter] = useState('');
+  const [productFilterId, setProductFilterId] = useState('');
   const [dashboardData, setDashboardData] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -156,18 +158,23 @@ function AdminDashboard() {
             <div className="admin-tab-content">
               <h1 className="admin-page-title">Dashboard</h1>
               {dashboardData && (
-                <AdminStats dashboardData={dashboardData} />
+                <AdminStats
+                  dashboardData={dashboardData}
+                  setActiveTab={setActiveTab}
+                  setUserRoleFilter={setUserRoleFilter}
+                  setProductFilterId={setProductFilterId}
+                />
               )}
             </div>
           )}
 
           {/* Products Tab */}
-          {activeTab === 'products' && (
+          {/* {activeTab === 'products' && (
             <div className="admin-tab-content">
               <h1 className="admin-page-title">Product Management</h1>
               <ProductManagement />
             </div>
-          )}
+          )} */}
 
           {/* Orders Tab */}
           {activeTab === 'orders' && (
@@ -181,7 +188,14 @@ function AdminDashboard() {
           {activeTab === 'users' && (
             <div className="admin-tab-content">
               <h1 className="admin-page-title">User Management</h1>
-              <UserManagement />
+              <UserManagement initialRoleFilter={userRoleFilter} />
+            </div>
+          )}
+
+          {activeTab === 'products' && (
+            <div className="admin-tab-content">
+              <h1 className="admin-page-title">Product Management</h1>
+              <ProductManagement initialProductId={productFilterId} />
             </div>
           )}
 

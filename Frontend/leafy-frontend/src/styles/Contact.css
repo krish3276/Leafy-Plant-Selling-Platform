@@ -178,6 +178,11 @@
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
 }
 
+.contact-form-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -303,7 +308,12 @@
 .contact-info-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  /* gap: 2rem; */
+}
+
+.contact-info-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1px;
 }
 
 .contact-info-cards {
