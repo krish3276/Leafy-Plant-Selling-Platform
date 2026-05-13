@@ -40,21 +40,44 @@ function Contact() {
     setIsSubmitting(true);
     setFormStatus({ type: '', message: '' });
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setFormStatus({
+          type: 'success',
+          message: data.message || 'Thank you for contacting us! We\'ll get back to you within 24 hours.'
+        });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        setFormStatus({
+          type: 'error',
+          message: data.message || 'Failed to send message. Please try again.'
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
       setFormStatus({
-        type: 'success',
-        message: 'Thank you for contacting us! We\'ll get back to you within 24 hours.'
+        type: 'error',
+        message: 'An error occurred. Please try again later.'
       });
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const contactReasons = [

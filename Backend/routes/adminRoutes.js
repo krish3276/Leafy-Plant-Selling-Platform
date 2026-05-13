@@ -19,6 +19,12 @@ import {
   updateAdminProfile,
   changePassword,
   getSystemSettings,
+  getNotificationPreferences,
+  updateNotificationTypePreference,
+  updateAllNotificationPreferences,
+  updateGlobalNotificationSettings,
+  resetNotificationPreferences,
+  getNotificationPreferencesSummary,
 } from '../controllers/adminController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
@@ -50,5 +56,13 @@ router.get('/settings', getSystemSettings);
 // Statistics
 router.get('/stats/users', getUserStats);
 router.get('/stats/orders', getOrderStats);
+
+// Notification Preferences Routes
+router.get('/notifications/preferences', getNotificationPreferences);
+router.get('/notifications/preferences/summary', getNotificationPreferencesSummary);
+router.put('/notifications/preferences/type', updateNotificationTypePreference);
+router.put('/notifications/preferences/all', updateAllNotificationPreferences);
+router.put('/notifications/preferences/global', updateGlobalNotificationSettings);
+router.post('/notifications/preferences/reset', resetNotificationPreferences);
 
 export default router;

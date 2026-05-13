@@ -10,6 +10,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import gardenRoutes from './routes/gardenRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -60,6 +61,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/garden', gardenRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

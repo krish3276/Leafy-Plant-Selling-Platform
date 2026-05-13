@@ -5,6 +5,7 @@
 
 import Product from '../models/Product.js';
 import User from '../models/User.js';
+import NotificationPreferences from '../models/NotificationPreferences.js';
 import { validationResult } from 'express-validator';
 
 // Get admin dashboard data
@@ -535,3 +536,337 @@ export const getSystemSettings = async (req, res) => {
     });
   }
 };
+
+/**
+ * 🔔 NOTIFICATION PREFERENCES ENDPOINTS
+ * Handle admin notification settings and preferences
+ */
+
+// Get notification preferences for admin
+export const getNotificationPreferences = async (req, res) => {
+  try {
+    let preferences = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    // If no preferences exist, create default ones
+    if (!preferences) {
+      preferences = await NotificationPreferences.create({
+        adminId: req.user.id,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      preferences,
+    });
+  } catch (error) {
+    console.error('Get Notification Preferences Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// Update specific notification type preferences
+export const updateNotificationTypePreference = async (req, res) => {
+  try {
+    const { notificationType, email, push, inApp, enabled } = req.body;
+
+    // Validate notification type
+    const validTypes = [
+      'orderPlaced',
+      'orderUpdated',
+      'orderCancelled',
+      'orderDelivered',
+      'systemAlert',
+      'productUpdates',
+    ];
+
+    if (!validTypes.includes(notificationType)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid notification type. Must be one of: ${validTypes.join(', ')}`,
+      });
+    }
+
+    // Find or create preferences
+    let preferences = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    if (!preferences) {
+      preferences = await NotificationPreferences.create({
+        adminId: req.user.id,
+      });
+    }
+
+    // Update the specific notification type preferences
+    const updateData = {};
+
+    if (enabled !== undefined) {
+      updateData[`preferences.${notificationType}.enabled`] = enabled;
+    }
+    if (email !== undefined) {
+      updateData[`preferences.${notificationType}.email`] = email;
+    }
+    if (push !== undefined) {
+      updateData[`preferences.${notificationType}.push`] = push;
+    }
+    if (inApp !== undefined) {
+      updateData[`preferences.${notificationType}.inApp`] = inApp;
+    }
+    updateData.lastUpdated = new Date();
+
+    const updatedPreferences = await NotificationPreferences.findByIdAndUpdate(
+      preferences._id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `${notificationType} preferences updated successfully`,
+      preferences: updatedPreferences,
+    });
+  } catch (error) {
+    console.error('Update Notification Type Preference Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// Update all notification preferences at once
+export const updateAllNotificationPreferences = async (req, res) => {
+  try {
+    const { preferences } = req.body;
+
+    if (!preferences || typeof preferences !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid preferences object is required',
+      });
+    }
+
+    let notificationPrefs = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    if (!notificationPrefs) {
+      notificationPrefs = await NotificationPreferences.create({
+        adminId: req.user.id,
+        preferences,
+      });
+    } else {
+      notificationPrefs.preferences = preferences;
+      notificationPrefs.lastUpdated = new Date();
+      await notificationPrefs.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'All notification preferences updated successfully',
+      preferences: notificationPrefs,
+    });
+  } catch (error) {
+    console.error('Update All Preferences Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// Update global notification settings
+export const updateGlobalNotificationSettings = async (req, res) => {
+  try {
+    const {
+      quietHoursEnabled,
+      quietHoursStart,
+      quietHoursEnd,
+      frequency,
+      doNotDisturb,
+      soundEnabled,
+      desktopNotifications,
+    } = req.body;
+
+    // Validate frequency value
+    if (
+      frequency &&
+      !['immediate', 'daily_digest', 'weekly_digest'].includes(frequency)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Invalid frequency. Must be: immediate, daily_digest, or weekly_digest',
+      });
+    }
+
+    // Validate quiet hours format (HH:mm)
+    const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+    if (quietHoursStart && !timeRegex.test(quietHoursStart)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid quietHoursStart format. Use HH:mm (24-hour format)',
+      });
+    }
+    if (quietHoursEnd && !timeRegex.test(quietHoursEnd)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid quietHoursEnd format. Use HH:mm (24-hour format)',
+      });
+    }
+
+    // Find or create preferences
+    let preferences = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    if (!preferences) {
+      preferences = await NotificationPreferences.create({
+        adminId: req.user.id,
+      });
+    }
+
+    // Update global settings
+    const updateData = {};
+
+    if (quietHoursEnabled !== undefined) {
+      updateData['globalSettings.quietHoursEnabled'] = quietHoursEnabled;
+    }
+    if (quietHoursStart !== undefined) {
+      updateData['globalSettings.quietHoursStart'] = quietHoursStart;
+    }
+    if (quietHoursEnd !== undefined) {
+      updateData['globalSettings.quietHoursEnd'] = quietHoursEnd;
+    }
+    if (frequency !== undefined) {
+      updateData['globalSettings.frequency'] = frequency;
+    }
+    if (doNotDisturb !== undefined) {
+      updateData['globalSettings.doNotDisturb'] = doNotDisturb;
+    }
+    if (soundEnabled !== undefined) {
+      updateData['globalSettings.soundEnabled'] = soundEnabled;
+    }
+    if (desktopNotifications !== undefined) {
+      updateData['globalSettings.desktopNotifications'] = desktopNotifications;
+    }
+    updateData.lastUpdated = new Date();
+
+    const updatedPreferences = await NotificationPreferences.findByIdAndUpdate(
+      preferences._id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Global notification settings updated successfully',
+      preferences: updatedPreferences,
+    });
+  } catch (error) {
+    console.error('Update Global Settings Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// Reset notification preferences to defaults
+export const resetNotificationPreferences = async (req, res) => {
+  try {
+    const preferences = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    if (!preferences) {
+      return res.status(404).json({
+        success: false,
+        message: 'No notification preferences found',
+      });
+    }
+
+    // Reset to default schema values
+    await NotificationPreferences.deleteOne({ _id: preferences._id });
+
+    // Create new with defaults
+    const newPreferences = await NotificationPreferences.create({
+      adminId: req.user.id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Notification preferences reset to defaults',
+      preferences: newPreferences,
+    });
+  } catch (error) {
+    console.error('Reset Preferences Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
+// Get notification preferences summary
+export const getNotificationPreferencesSummary = async (req, res) => {
+  try {
+    const preferences = await NotificationPreferences.findOne({
+      adminId: req.user.id,
+    });
+
+    if (!preferences) {
+      return res.status(404).json({
+        success: false,
+        message: 'No notification preferences found',
+      });
+    }
+
+    // Generate summary
+    const summary = {
+      enabledNotifications: [],
+      disabledNotifications: [],
+      emailEnabled: 0,
+      pushEnabled: 0,
+      inAppEnabled: 0,
+      globalSettings: preferences.globalSettings,
+    };
+
+    // Count enabled/disabled and channels
+    Object.entries(preferences.preferences).forEach(([type, settings]) => {
+      if (settings.enabled) {
+        summary.enabledNotifications.push(type);
+      } else {
+        summary.disabledNotifications.push(type);
+      }
+
+      if (settings.email) summary.emailEnabled++;
+      if (settings.push) summary.pushEnabled++;
+      if (settings.inApp) summary.inAppEnabled++;
+    });
+
+    res.status(200).json({
+      success: true,
+      summary,
+      fullPreferences: preferences,
+    });
+  } catch (error) {
+    console.error('Get Preferences Summary Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+

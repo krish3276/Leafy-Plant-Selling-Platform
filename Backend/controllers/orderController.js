@@ -2,6 +2,7 @@ import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import { syncGardenPlantsFromOrder } from './gardenController.js';
+import { createNotification } from './notificationController.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -141,6 +142,34 @@ export const createOrder = async (req, res) => {
     // Clear user's cart
     user.cart = [];
     await user.save();
+
+    // Notify all admins about the new order
+    try {
+      const admins = await User.find({ role: 'admin' }).select('_id firstName lastName email');
+
+      const notificationPayload = {
+        type: 'order_placed',
+        title: `New Order: ${order.orderNumber}`,
+        message: `A new order (${order.orderNumber}) was placed by ${user.firstName} ${user.lastName}.`,
+        relatedId: order._id,
+        relatedType: 'order',
+        data: {
+          orderId: order._id,
+          total: order.total,
+        },
+        priority: 'high',
+      };
+
+      for (const admin of admins) {
+        // createNotification returns the created notification or null on error
+        // run without awaiting to avoid delaying response too long
+        createNotification(admin._id, notificationPayload).catch((err) =>
+          console.error('Failed to create admin notification:', err)
+        );
+      }
+    } catch (notifyErr) {
+      console.error('Error notifying admins about new order:', notifyErr);
+    }
 
     res.status(201).json({
       success: true,
@@ -496,6 +525,36 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     await order.save();
+
+    // Notify admins about order status change
+    try {
+      const admins = await User.find({ role: 'admin' }).select('_id firstName lastName email');
+
+      let notifType = 'order_updated';
+      if (order.orderStatus === 'delivered') notifType = 'order_delivered';
+      if (order.orderStatus === 'cancelled') notifType = 'order_cancelled';
+
+      const notificationPayload = {
+        type: notifType,
+        title: `Order ${order.orderNumber} - ${order.orderStatus}`,
+        message: `Order ${order.orderNumber} status changed to ${order.orderStatus}.`,
+        relatedId: order._id,
+        relatedType: 'order',
+        data: {
+          orderId: order._id,
+          orderStatus: order.orderStatus,
+        },
+        priority: order.orderStatus === 'cancelled' ? 'high' : 'medium',
+      };
+
+      for (const admin of admins) {
+        createNotification(admin._id, notificationPayload).catch((err) =>
+          console.error('Failed to create order status notification:', err)
+        );
+      }
+    } catch (notifyErr) {
+      console.error('Error notifying admins about order update:', notifyErr);
+    }
 
     res.status(200).json({
       success: true,

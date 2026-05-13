@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Lock, Bell, Shield, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Save, Lock, Bell, Shield, Eye, EyeOff, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
 import '../../styles/AdminSettings.css';
 
 function AdminSettings() {
@@ -42,6 +42,27 @@ function AdminSettings() {
     maxProductsPerPage: 10,
   });
 
+  // Notification preferences state
+  const [notificationPreferences, setNotificationPreferences] = useState({
+    preferences: {
+      orderPlaced: { enabled: true, email: true, push: true, inApp: true },
+      orderUpdated: { enabled: true, email: true, push: true, inApp: true },
+      orderCancelled: { enabled: true, email: true, push: false, inApp: true },
+      orderDelivered: { enabled: true, email: true, push: true, inApp: true },
+      systemAlert: { enabled: true, email: true, push: true, inApp: true },
+      productUpdates: { enabled: true, email: false, push: true, inApp: true },
+    },
+    globalSettings: {
+      quietHoursEnabled: false,
+      quietHoursStart: '22:00',
+      quietHoursEnd: '08:00',
+      frequency: 'immediate',
+      doNotDisturb: false,
+      soundEnabled: true,
+      desktopNotifications: true,
+    },
+  });
+
   const token = localStorage.getItem('authToken');
   const API_BASE = 'http://localhost:5000/api/admin';
 
@@ -49,6 +70,7 @@ function AdminSettings() {
   useEffect(() => {
     fetchAdminProfile();
     fetchSystemSettings();
+    fetchNotificationPreferences();
   }, []);
 
   const fetchAdminProfile = async () => {
@@ -86,6 +108,144 @@ function AdminSettings() {
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
+    }
+  };
+
+  // 🔔 Fetch notification preferences from backend
+  const fetchNotificationPreferences = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/notifications/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.preferences) {
+        setNotificationPreferences({
+          preferences: data.preferences.preferences,
+          globalSettings: data.preferences.globalSettings,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+    }
+  };
+
+  // 🔔 Update individual notification type
+  const updateNotificationType = async (notificationType, updates) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${API_BASE}/notifications/preferences/type`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          notificationType,
+          ...updates,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update local state
+        setNotificationPreferences((prev) => ({
+          ...prev,
+          preferences: {
+            ...prev.preferences,
+            [notificationType]: {
+              ...prev.preferences[notificationType],
+              ...updates,
+            },
+          },
+        }));
+        showNotification(`✅ ${notificationType} preferences updated!`, 'success');
+      } else {
+        showNotification(data.message || 'Failed to update notification preferences', 'error');
+      }
+    } catch (error) {
+      showNotification('Error updating notification preferences', 'error');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔔 Update global notification settings
+  const updateGlobalNotificationSettings = async () => {
+    try {
+      setLoading(true);
+
+      // Validate quiet hours
+      if (notificationPreferences.globalSettings.quietHoursEnabled) {
+        const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeRegex.test(notificationPreferences.globalSettings.quietHoursStart)) {
+          showNotification('Invalid quiet hours start time. Use HH:mm format', 'error');
+          setLoading(false);
+          return;
+        }
+        if (!timeRegex.test(notificationPreferences.globalSettings.quietHoursEnd)) {
+          showNotification('Invalid quiet hours end time. Use HH:mm format', 'error');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const response = await fetch(`${API_BASE}/notifications/preferences/global`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notificationPreferences.globalSettings),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showNotification('✅ Global notification settings updated!', 'success');
+      } else {
+        showNotification(data.message || 'Failed to update settings', 'error');
+      }
+    } catch (error) {
+      showNotification('Error updating global settings', 'error');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔔 Reset notification preferences to defaults
+  const resetNotificationPreferences = async () => {
+    if (window.confirm('Are you sure you want to reset all notification preferences to defaults?')) {
+      try {
+        setLoading(true);
+
+        const response = await fetch(`${API_BASE}/notifications/preferences/reset`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setNotificationPreferences({
+            preferences: data.preferences.preferences,
+            globalSettings: data.preferences.globalSettings,
+          });
+          showNotification('✅ Preferences reset to defaults!', 'success');
+        } else {
+          showNotification('Failed to reset preferences', 'error');
+        }
+      } catch (error) {
+        showNotification('Error resetting preferences', 'error');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -514,80 +674,244 @@ function AdminSettings() {
             <p className="settings-subtitle">Control how and when you receive notifications</p>
 
             <div className="settings-form">
-              <div className="notification-options">
-                <div className="notification-item">
-                  <div className="notification-header">
-                    <h3>📧 Email Notifications</h3>
-                    <label className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        name="emailNotifications"
-                        checked={systemSettings.emailNotifications}
-                        onChange={handleSystemSettingChange}
-                      />
-                      <span className="slider"></span>
-                    </label>
+              {/* Notification Type Preferences */}
+              <div className="notification-preferences-container">
+                <h3 className="section-title">📋 Notification Type Preferences</h3>
+                
+                {Object.entries(notificationPreferences.preferences).map(([type, settings]) => (
+                  <div key={type} className="notification-type-card">
+                    <div className="notification-type-header">
+                      <div className="type-info">
+                        <h4>{type.replace(/([A-Z])/g, ' $1').trim()}</h4>
+                        <label className="toggle-switch">
+                          <input
+                            type="checkbox"
+                            checked={settings.enabled}
+                            onChange={() =>
+                              updateNotificationType(type, {
+                                enabled: !settings.enabled,
+                              })
+                            }
+                            disabled={loading}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {settings.enabled && (
+                      <div className="channel-toggles">
+                        <label className="channel-toggle">
+                          <input
+                            type="checkbox"
+                            checked={settings.email}
+                            onChange={() =>
+                              updateNotificationType(type, {
+                                email: !settings.email,
+                              })
+                            }
+                            disabled={loading}
+                          />
+                          <span>📧 Email</span>
+                        </label>
+
+                        <label className="channel-toggle">
+                          <input
+                            type="checkbox"
+                            checked={settings.push}
+                            onChange={() =>
+                              updateNotificationType(type, {
+                                push: !settings.push,
+                              })
+                            }
+                            disabled={loading}
+                          />
+                          <span>🔔 Push</span>
+                        </label>
+
+                        <label className="channel-toggle">
+                          <input
+                            type="checkbox"
+                            checked={settings.inApp}
+                            onChange={() =>
+                              updateNotificationType(type, {
+                                inApp: !settings.inApp,
+                              })
+                            }
+                            disabled={loading}
+                          />
+                          <span>💬 In-App</span>
+                        </label>
+                      </div>
+                    )}
                   </div>
-                  <p>Receive email alerts for important events and updates</p>
-                </div>
-
-                <div className="notification-item">
-                  <h3>📱 Push Notifications</h3>
-                  <p>In-browser push notifications for real-time updates</p>
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
-
-                <div className="notification-item">
-                  <h3>🛒 Order Notifications</h3>
-                  <p>Get notified when new orders are placed</p>
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
-
-                <div className="notification-item">
-                  <h3>📦 Product Updates</h3>
-                  <p>Notifications about product stock changes</p>
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
-
-                <div className="notification-item">
-                  <h3>⚠️ Critical Alerts</h3>
-                  <p>Important system alerts and errors (always enabled)</p>
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      disabled
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
+                ))}
               </div>
 
-              <button
-                className="settings-save-btn"
-                onClick={() => showNotification('✅ Notification settings saved!', 'success')}
-              >
-                <Save size={18} />
-                Save Preferences
-              </button>
+              {/* Global Notification Settings */}
+              <div className="global-settings-container">
+                <h3 className="section-title">⚙️ Global Settings</h3>
+
+                {/* Notification Frequency */}
+                <div className="settings-group">
+                  <label>📡 Notification Frequency</label>
+                  <select
+                    value={notificationPreferences.globalSettings.frequency}
+                    onChange={(e) =>
+                      setNotificationPreferences((prev) => ({
+                        ...prev,
+                        globalSettings: {
+                          ...prev.globalSettings,
+                          frequency: e.target.value,
+                        },
+                      }))
+                    }
+                    disabled={loading}
+                  >
+                    <option value="immediate">Immediate</option>
+                    <option value="daily_digest">Daily Digest</option>
+                    <option value="weekly_digest">Weekly Digest</option>
+                  </select>
+                </div>
+
+                {/* Quiet Hours */}
+                <div className="settings-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={notificationPreferences.globalSettings.quietHoursEnabled}
+                      onChange={(e) =>
+                        setNotificationPreferences((prev) => ({
+                          ...prev,
+                          globalSettings: {
+                            ...prev.globalSettings,
+                            quietHoursEnabled: e.target.checked,
+                          },
+                        }))
+                      }
+                      disabled={loading}
+                    />
+                    <span>🕐 Enable Quiet Hours</span>
+                  </label>
+
+                  {notificationPreferences.globalSettings.quietHoursEnabled && (
+                    <div className="time-inputs">
+                      <div className="time-input-group">
+                        <label>From:</label>
+                        <input
+                          type="time"
+                          value={notificationPreferences.globalSettings.quietHoursStart}
+                          onChange={(e) =>
+                            setNotificationPreferences((prev) => ({
+                              ...prev,
+                              globalSettings: {
+                                ...prev.globalSettings,
+                                quietHoursStart: e.target.value,
+                              },
+                            }))
+                          }
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="time-input-group">
+                        <label>To:</label>
+                        <input
+                          type="time"
+                          value={notificationPreferences.globalSettings.quietHoursEnd}
+                          onChange={(e) =>
+                            setNotificationPreferences((prev) => ({
+                              ...prev,
+                              globalSettings: {
+                                ...prev.globalSettings,
+                                quietHoursEnd: e.target.value,
+                              },
+                            }))
+                          }
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sound Toggle */}
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPreferences.globalSettings.soundEnabled}
+                    onChange={(e) =>
+                      setNotificationPreferences((prev) => ({
+                        ...prev,
+                        globalSettings: {
+                          ...prev.globalSettings,
+                          soundEnabled: e.target.checked,
+                        },
+                      }))
+                    }
+                    disabled={loading}
+                  />
+                  <span>🔊 Enable Sound Notifications</span>
+                </label>
+
+                {/* Desktop Notifications Toggle */}
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPreferences.globalSettings.desktopNotifications}
+                    onChange={(e) =>
+                      setNotificationPreferences((prev) => ({
+                        ...prev,
+                        globalSettings: {
+                          ...prev.globalSettings,
+                          desktopNotifications: e.target.checked,
+                        },
+                      }))
+                    }
+                    disabled={loading}
+                  />
+                  <span>🖥️ Enable Desktop Notifications</span>
+                </label>
+
+                {/* Do Not Disturb Toggle */}
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPreferences.globalSettings.doNotDisturb}
+                    onChange={(e) =>
+                      setNotificationPreferences((prev) => ({
+                        ...prev,
+                        globalSettings: {
+                          ...prev.globalSettings,
+                          doNotDisturb: e.target.checked,
+                        },
+                      }))
+                    }
+                    disabled={loading}
+                  />
+                  <span>⛔ Do Not Disturb (Silence All)</span>
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="settings-actions">
+                <button
+                  className="settings-save-btn"
+                  onClick={updateGlobalNotificationSettings}
+                  disabled={loading}
+                >
+                  <Save size={18} />
+                  {loading ? 'Saving...' : 'Save Global Settings'}
+                </button>
+
+                <button
+                  className="settings-reset-btn"
+                  onClick={resetNotificationPreferences}
+                  disabled={loading}
+                >
+                  <RotateCcw size={18} />
+                  {loading ? 'Resetting...' : 'Reset to Defaults'}
+                </button>
+              </div>
             </div>
           </div>
         )}

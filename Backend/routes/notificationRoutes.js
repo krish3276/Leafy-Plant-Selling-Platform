@@ -29,11 +29,11 @@ router.get('/unread/count', getUnreadCount);
 // Get notification stats
 router.get('/stats', getNotificationStats);
 
+// Mark all notifications as read (must be before /:notificationId/read)
+router.put('/all/read', markAllAsRead);
+
 // Mark specific notification as read
 router.put('/:notificationId/read', markAsRead);
-
-// Mark all notifications as read
-router.put('/all/read', markAllAsRead);
 
 // Delete specific notification
 router.delete('/:notificationId', deleteNotification);

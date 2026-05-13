@@ -17,6 +17,7 @@ import OrdersManagement from '../components/Admin/OrdersManagement';
 import UserManagement from '../components/Admin/UserManagement';
 import AdminSettings from '../components/Admin/AdminSettings';
 import AdminNotifications from '../components/Admin/AdminNotifications';
+import AdminContactMessages from '../components/Admin/AdminContactMessages';
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -195,6 +196,13 @@ function AdminDashboard() {
           {activeTab === 'notifications' && (
             <div className="admin-tab-content">
               <AdminNotifications />
+            </div>
+          )}
+
+          {/* Contact Messages Tab */}
+          {activeTab === 'contacts' && (
+            <div className="admin-tab-content">
+              <AdminContactMessages />
             </div>
           )}
         </div>
