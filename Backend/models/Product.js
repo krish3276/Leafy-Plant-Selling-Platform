@@ -68,6 +68,61 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    // Tool/Accessory specific fields
+    toolType: {
+      type: String,
+      enum: [
+        'watering-can',
+        'pruning-shears',
+        'soil-mix',
+        'pot',
+        'planter',
+        'stand',
+        'trellis',
+        'mister',
+        'fertilizer',
+        'gloves',
+        'spade',
+        'rake',
+        'light',
+        'thermometer',
+        'moisture-meter',
+        'other'
+      ],
+      default: null,
+    },
+
+    material: {
+      type: String,
+      default: null,
+    },
+
+    color: {
+      type: String,
+      default: null,
+    },
+
+    dimensions: {
+      type: String,
+      default: null,
+    },
+
+    weight: {
+      type: String,
+      default: null,
+    },
+
+    warranty: {
+      type: String,
+      default: '1 year',
+    },
+
+    compatible: [
+      {
+        type: String,
+      },
+    ],
+
     rating: {
       type: Number,
       default: 0,

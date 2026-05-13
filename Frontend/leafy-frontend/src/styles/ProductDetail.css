@@ -291,6 +291,33 @@
   font-size: 0.95rem;
 }
 
+/* Additional Specs for Accessories */
+.additional-specs {
+  background: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  border-left: 4px solid #4caf50;
+}
+
+.spec-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.spec-item strong {
+  color: #2d5a27;
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.spec-item:last-child {
+  margin-bottom: 0;
+}
+
 /* Add to Cart Section */
 .add-to-cart-section {
   display: flex;

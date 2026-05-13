@@ -121,8 +121,20 @@ function Shop() {
         </div>
       )}
       <div className="shop-header">
-        <h1>Shop All Plants</h1>
-        <p>Discover our full collection of beautiful plants</p>
+        <h1>
+          {filters.category === '' && 'Shop All Plants'}
+          {filters.category === 'indoor' && 'Indoor Plants'}
+          {filters.category === 'outdoor' && 'Outdoor Plants'}
+          {filters.category === 'succulents' && 'Succulents'}
+          {filters.category === 'accessories' && 'Plant Care Tools & Accessories'}
+        </h1>
+        <p>
+          {filters.category === '' && 'Discover our full collection of beautiful plants'}
+          {filters.category === 'indoor' && 'Transform your indoor spaces with our curated selection'}
+          {filters.category === 'outdoor' && 'Beautify your garden and patio with outdoor plants'}
+          {filters.category === 'succulents' && 'Low-maintenance succulents for modern spaces'}
+          {filters.category === 'accessories' && 'Everything you need for healthy, thriving plants'}
+        </p>
       </div>
 
       {/* Filters Section */}
@@ -210,16 +222,31 @@ function Shop() {
                     <h3 className="product-name">{product.name}</h3>
                   </Link>
                   <p className="product-category">{product.category}</p>
-                  <p className="product-price">${product.price.toFixed(2)}</p>
+                  <p className="product-price">₹{product.price}</p>
                   
-                  <div className="product-meta">
-                    <span className="difficulty">
-                      🌱 {product.difficulty || 'Medium'}
-                    </span>
-                    <span className="sunlight">
-                      ☀️ {product.sunlight || 'Medium'}
-                    </span>
-                  </div>
+                  {filters.category !== 'accessories' ? (
+                    <div className="product-meta">
+                      <span className="difficulty">
+                        🌱 {product.difficulty || 'Medium'}
+                      </span>
+                      <span className="sunlight">
+                        ☀️ {product.sunlight || 'Medium'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="product-meta">
+                      {product.toolType && (
+                        <span className="tool-type">
+                          🛠️ {product.toolType.replace(/-/g, ' ')}
+                        </span>
+                      )}
+                      {product.warranty && (
+                        <span className="warranty">
+                          ✓ {product.warranty}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   <button
                     className={`add-to-cart-btn ${addingToCart === product._id ? 'adding' : ''}`}

@@ -255,42 +255,98 @@ function ProductDetail() {
 
           <p className="product-description">{product.description}</p>
 
-          {/* Plant Care Info */}
-          <div className="care-info">
-            <div className="care-item">
-              <Sun size={20} />
-              <div>
-                <span className="care-label">Sunlight</span>
-                <span className="care-value">{getSunlightIcon(product.sunlight)} {product.sunlight || 'Medium'}</span>
+          {/* Plant Care Info - for plants */}
+          {product.category !== 'accessories' && (
+            <div className="care-info">
+              <div className="care-item">
+                <Sun size={20} />
+                <div>
+                  <span className="care-label">Sunlight</span>
+                  <span className="care-value">{getSunlightIcon(product.sunlight)} {product.sunlight || 'Medium'}</span>
+                </div>
+              </div>
+              <div className="care-item">
+                <Droplets size={20} />
+                <div>
+                  <span className="care-label">Watering</span>
+                  <span className="care-value">{product.waterFrequency || 'Once a week'}</span>
+                </div>
+              </div>
+              <div className="care-item">
+                <Ruler size={20} />
+                <div>
+                  <span className="care-label">Size</span>
+                  <span className="care-value">{product.size || 'Medium'}</span>
+                </div>
+              </div>
+              <div className="care-item">
+                <Leaf size={20} />
+                <div>
+                  <span className="care-label">Difficulty</span>
+                  <span
+                    className="care-value"
+                    style={{ color: getDifficultyColor(product.difficulty) }}
+                  >
+                    {product.difficulty || 'Medium'}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="care-item">
-              <Droplets size={20} />
-              <div>
-                <span className="care-label">Watering</span>
-                <span className="care-value">{product.waterFrequency || 'Once a week'}</span>
-              </div>
+          )}
+
+          {/* Tool/Accessory Info - for accessories */}
+          {product.category === 'accessories' && (
+            <div className="care-info">
+              {product.toolType && (
+                <div className="care-item">
+                  <span className="care-label">Type</span>
+                  <span className="care-value">🛠️ {product.toolType.replace(/-/g, ' ')}</span>
+                </div>
+              )}
+              {product.material && (
+                <div className="care-item">
+                  <span className="care-label">Material</span>
+                  <span className="care-value">{product.material}</span>
+                </div>
+              )}
+              {product.color && (
+                <div className="care-item">
+                  <span className="care-label">Color</span>
+                  <span className="care-value">{product.color}</span>
+                </div>
+              )}
+              {product.warranty && (
+                <div className="care-item">
+                  <Shield size={20} />
+                  <div>
+                    <span className="care-label">Warranty</span>
+                    <span className="care-value">{product.warranty}</span>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="care-item">
-              <Ruler size={20} />
-              <div>
-                <span className="care-label">Size</span>
-                <span className="care-value">{product.size || 'Medium'}</span>
-              </div>
+          )}
+
+          {/* Additional Details for Accessories */}
+          {product.category === 'accessories' && (
+            <div className="additional-specs">
+              {product.dimensions && (
+                <div className="spec-item">
+                  <strong>Dimensions:</strong> {product.dimensions}
+                </div>
+              )}
+              {product.weight && (
+                <div className="spec-item">
+                  <strong>Weight:</strong> {product.weight}
+                </div>
+              )}
+              {product.compatible && product.compatible.length > 0 && (
+                <div className="spec-item">
+                  <strong>Compatible With:</strong> {product.compatible.join(', ')}
+                </div>
+              )}
             </div>
-            <div className="care-item">
-              <Leaf size={20} />
-              <div>
-                <span className="care-label">Difficulty</span>
-                <span
-                  className="care-value"
-                  style={{ color: getDifficultyColor(product.difficulty) }}
-                >
-                  {product.difficulty || 'Medium'}
-                </span>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Features */}
           {product.features && product.features.length > 0 && (
