@@ -90,6 +90,7 @@
   margin-bottom: 1.5rem;
   position: relative;
   padding-bottom: 1rem;
+  /* text-align: center; */
 }
 
 /* .section-title::after {
@@ -224,6 +225,11 @@
   background-color: white;
 }
 
+.what-we-provide h2 {
+  font-size: 2.5rem;
+  justify-self: center;
+}
+
 .provide-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -293,6 +299,11 @@
   max-width: 1400px;
   margin: 0 auto;
   text-align: center;
+}
+
+.mission-container h2 {
+  font-size: 2.5rem;
+  justify-self: center;
 }
 
 .mission-grid {

@@ -108,7 +108,8 @@ function AdminNotifications() {
       if (data.success) {
         fetchNotifications();
         fetchUnreadCount();
-        showNotification('✅ Notification marked as read', 'success');
+        // showNotification('✅ Notification marked as read', 'success');
+        showNotification('Notification marked as read', 'success');
       }
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -128,7 +129,8 @@ function AdminNotifications() {
       if (data.success) {
         fetchNotifications();
         fetchUnreadCount();
-        showNotification(`✅ ${data.updated} notifications marked as read`, 'success');
+        // showNotification(`✅ ${data.updated} notifications marked as read`, 'success');
+        showNotification(`${data.updated} notifications marked as read`, 'success');
       }
     } catch (error) {
       console.error('Error marking all as read:', error);
@@ -240,8 +242,8 @@ function AdminNotifications() {
       {/* Header */}
       <div className="notifications-header">
         <div className="notifications-title">
-          <Bell size={28} />
-          <h1>Notifications {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}</h1>
+          <Bell size={28} /> {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+          <h1>Notifications </h1>
         </div>
 
         <div className="notifications-actions">

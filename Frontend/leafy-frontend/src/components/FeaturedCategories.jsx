@@ -35,7 +35,7 @@ function FeaturedCategories() {
       title: 'Plant Care',
       description: 'Tools and accessories',
       image: cat4,
-      link: ''
+      link: '/shop/accessories'
     }
   ];
 

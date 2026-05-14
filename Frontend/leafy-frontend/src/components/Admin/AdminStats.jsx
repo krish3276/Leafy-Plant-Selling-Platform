@@ -7,14 +7,30 @@ import {
 } from 'lucide-react';
 import './AdminStats.css';
 
-function AdminStats({ dashboardData }) {
+function AdminStats({ dashboardData, setActiveTab, setUserRoleFilter }) {
   const { stats, lowStockProducts, recentProducts } = dashboardData;
+
+  const handleCardClick = (tab, role, productId) => {
+    if (typeof setUserRoleFilter === 'function') {
+      setUserRoleFilter(role || '');
+    }
+    if (typeof setProductFilterId === 'function') {
+      setProductFilterId(productId || '');
+    }
+    if (typeof setActiveTab === 'function') setActiveTab(tab);
+  };
 
   return (
     <div className="admin-stats-container">
       {/* Stats Grid */}
       <div className="stats-grid">
-        <div className="stat-card">
+        <div
+          className="stat-card clickable-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick('products')}
+          onKeyDown={(e) => e.key === 'Enter' && handleCardClick('products')}
+        >
           <div className="stat-icon products-icon">
             <Package size={28} />
           </div>
@@ -24,7 +40,13 @@ function AdminStats({ dashboardData }) {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div
+          className="stat-card clickable-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick('users')}
+          onKeyDown={(e) => e.key === 'Enter' && handleCardClick('users')}
+        >
           <div className="stat-icon users-icon">
             <Users size={28} />
           </div>
@@ -34,7 +56,13 @@ function AdminStats({ dashboardData }) {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div
+          className="stat-card clickable-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick('users', 'admin')}
+          onKeyDown={(e) => e.key === 'Enter' && handleCardClick('users', 'admin')}
+        >
           <div className="stat-icon admins-icon">
             <TrendingUp size={28} />
           </div>
@@ -44,7 +72,13 @@ function AdminStats({ dashboardData }) {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div
+          className="stat-card clickable-card"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick('products')}
+          onKeyDown={(e) => e.key === 'Enter' && handleCardClick('products')}
+        >
           <div className="stat-icon warning-icon">
             <AlertTriangle size={28} />
           </div>
@@ -75,7 +109,14 @@ function AdminStats({ dashboardData }) {
               <tbody>
                 {lowStockProducts && lowStockProducts.length > 0 ? (
                   lowStockProducts.map((product) => (
-                    <tr key={product._id}>
+                    <tr
+                      key={product._id}
+                      className="clickable-row"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleCardClick('products', null, product._id)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCardClick('products', null, product._id)}
+                    >
                       <td className="product-name">{product.name}</td>
                       <td>{product.category}</td>
                       <td>
@@ -114,7 +155,14 @@ function AdminStats({ dashboardData }) {
               <tbody>
                 {recentProducts && recentProducts.length > 0 ? (
                   recentProducts.map((product) => (
-                    <tr key={product._id}>
+                    <tr
+                      key={product._id}
+                      className="clickable-row"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleCardClick('products', null, product._id)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCardClick('products', null, product._id)}
+                    >
                       <td className="product-name">{product.name}</td>
                       <td>{product.category}</td>
                       <td>${product.price.toFixed(2)}</td>

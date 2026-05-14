@@ -40,6 +40,16 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Clickable card styles */
+.clickable-card {
+  cursor: pointer;
+}
+
+.clickable-card:focus {
+  outline: 2px solid rgba(99,102,241,0.2);
+  transform: translateY(-4px);
+}
+
 .stat-icon {
   width: 70px;
   height: 70px;
@@ -113,6 +123,7 @@
 }
 
 .table-title {
+  width: 300%;
   margin: 0;
   color: #1a1a1a;
   font-size: 1.1rem;
@@ -151,6 +162,16 @@
 
 .admin-table tbody tr:hover {
   background: #f9fafb;
+}
+
+/* Clickable table row */
+.admin-table tbody tr.clickable-row {
+  cursor: pointer;
+}
+
+.admin-table tbody tr.clickable-row:focus,
+.admin-table tbody tr.clickable-row:focus-visible {
+  outline: 2px solid rgba(45,95,63,0.12);
 }
 
 .product-name {

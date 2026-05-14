@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, Search, AlertCircle } from 'lucide-react';
 import './ProductManagement.css';
 import ProductForm from './ProductForm';
 
-function ProductManagement() {
+function ProductManagement({ initialProductId = '' }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -11,14 +11,174 @@ function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [highlightProductId, setHighlightProductId] = useState('');
+  const [searchedInitialProductId, setSearchedInitialProductId] = useState('');
+  const [flashProductId, setFlashProductId] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
+    // If an initial product ID is provided, try to find it across pages (only once per id)
+    if (initialProductId) {
+      if (initialProductId !== searchedInitialProductId) {
+        setSearchedInitialProductId(initialProductId);
+        findProductAcrossPages(initialProductId);
+      }
+      return;
+    }
+
+    // clear state if no initialProductId
+    setSearchedInitialProductId('');
+    setHighlightProductId('');
     fetchProducts();
-  }, [page]);
+  }, [page, initialProductId]);
+
+  // After product list renders, if we have a highlighted id and it's in DOM, scroll and flash it
+  useEffect(() => {
+    if (!highlightProductId || products.length === 0) return;
+
+    const el = document.getElementById(`product-row-${highlightProductId}`);
+    if (el) {
+      // Smooth scroll and apply flash
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('flash-highlight');
+      setFlashProductId(highlightProductId);
+      // remove flash after 2.5s
+      const t = setTimeout(() => {
+        el.classList.remove('flash-highlight');
+        setFlashProductId('');
+      }, 2500);
+      return () => clearTimeout(t);
+    }
+  }, [products, highlightProductId]);
+
+  const fetchProductsForInitial = async (initialId) => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await fetch(
+        `http://localhost:5000/api/admin/products?page=${1}&limit=10&search=${searchTerm}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!data.success) {
+        // fallback: fetch single product
+        fetchSingleProduct(initialId);
+        return;
+      }
+
+      setProducts(data.products);
+      setTotalPages(data.pagination.pages);
+
+      const found = data.products.find((p) => p._id === initialId);
+      if (found) {
+        setHighlightProductId(initialId);
+        // do not auto-open editor in this case; scroll handled in effect
+      } else {
+        // not on this page — fetch the single product and open editor
+        fetchSingleProduct(initialId);
+      }
+    } catch (err) {
+      console.error('Fetch Error:', err);
+      // fallback
+      fetchSingleProduct(initialId);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search all pages sequentially for the product id; if found, load that page and highlight
+  const findProductAcrossPages = async (id) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // First fetch page 1 to know total pages
+      let pageNum = 1;
+      let totalPagesAvailable = 1;
+
+      while (pageNum <= totalPagesAvailable) {
+        const response = await fetch(
+          `http://localhost:5000/api/admin/products?page=${pageNum}&limit=10&search=${searchTerm}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+          // fallback to single-product fetch
+          await fetchSingleProduct(id);
+          return;
+        }
+
+        totalPagesAvailable = data.pagination?.pages || 1;
+
+        // check if product present on this page
+        const found = data.products.find((p) => p._id === id);
+        if (found) {
+          setProducts(data.products);
+          setTotalPages(totalPagesAvailable);
+          setHighlightProductId(id);
+          setPage(pageNum);
+          return;
+        }
+
+        pageNum += 1;
+      }
+
+      // Not found in paginated list — fallback to fetching single product and opening editor
+      await fetchSingleProduct(id);
+    } catch (err) {
+      console.error('Error searching pages for product:', err);
+      await fetchSingleProduct(id);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSingleProduct = async (id) => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await fetch(`http://localhost:5000/api/admin/products/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setError(data.message || 'Failed to fetch product');
+        setProducts([]);
+        setTotalPages(1);
+        return;
+      }
+
+      setProducts([data.product]);
+      setTotalPages(1);
+      // auto-open edit modal and set editing product
+      setEditingProduct(data.product);
+      setShowForm(true);
+    } catch (err) {
+      console.error('Fetch Error:', err);
+      setError('Failed to load product');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -183,7 +343,11 @@ function ProductManagement() {
                 <tbody>
                   {products && products.length > 0 ? (
                     products.map((product) => (
-                      <tr key={product._id}>
+                      <tr
+                        id={`product-row-${product._id}`}
+                        key={product._id}
+                        className={product._id === highlightProductId ? 'highlighted-row' : ''}
+                      >
                         <td>{product.name}</td>
                         <td>{product.category}</td>
                         <td>${product.price.toFixed(2)}</td>

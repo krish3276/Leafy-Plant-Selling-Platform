@@ -237,7 +237,7 @@ export const getGardenPlants = async (req, res) => {
     const gardenPlants = await GardenPlant.find({ user: req.user.id })
       .sort({ updatedAt: -1 })
       .populate('product', 'name image price category stock isActive')
-      .populate('order', 'orderNumber createdAt');
+      .populate('order', 'orderNumber createdAt orderStatus');
 
     const visiblePlants = gardenPlants.filter((plant) => {
       if (plant.sourceType !== 'order') {
@@ -412,7 +412,7 @@ export const updateGardenPlant = async (req, res) => {
 
     const refreshedPlant = await GardenPlant.findById(gardenPlant._id)
       .populate('product', 'name image price category stock isActive')
-      .populate('order', 'orderNumber createdAt');
+      .populate('order', 'orderNumber createdAt orderStatus');
 
     res.status(200).json({
       success: true,
@@ -502,7 +502,7 @@ export const logGardenCare = async (req, res) => {
 
     const refreshedPlant = await GardenPlant.findById(gardenPlant._id)
       .populate('product', 'name image price category stock isActive')
-      .populate('order', 'orderNumber createdAt');
+      .populate('order', 'orderNumber createdAt orderStatus');
 
     res.status(200).json({
       success: true,

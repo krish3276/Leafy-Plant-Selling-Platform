@@ -163,6 +163,37 @@
   background: #f9fafb;
 }
 
+/* Highlighted product row when opened from dashboard */
+.product-table tbody tr.highlighted-row {
+  background: linear-gradient(90deg, rgba(45,95,63,0.06), rgba(99,102,241,0.02));
+  border-left: 4px solid rgba(45,95,63,0.15);
+}
+
+.product-table tbody tr.highlighted-row td {
+  transition: background 0.2s ease;
+}
+
+/* Flash animation for 2.5s darker highlight */
+.product-table tbody tr.flash-highlight,
+.product-table tbody tr.flash-highlight td {
+  animation: flashHighlight 2.5s ease forwards;
+}
+
+@keyframes flashHighlight {
+  0% {
+    background: rgba(45,95,63,0.30);
+    color: #fff;
+  }
+  40% {
+    background: rgba(45,95,63,0.18);
+    color: inherit;
+  }
+  100% {
+    background: transparent;
+    color: inherit;
+  }
+}
+
 .stock-badge {
   display: inline-block;
   padding: 0.4rem 0.8rem;

@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   Bell,
+  Mail,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './AdminSidebar.css';
@@ -40,6 +41,11 @@ function AdminSidebar({ activeTab, setActiveTab, sidebarOpen, user }) {
       id: 'notifications',
       icon: <Bell size={20} />,
       label: 'Notifications',
+    },
+    {
+      id: 'contacts',
+      icon: <Mail size={20} />,
+      label: 'Contact Messages',
     },
     {
       id: 'settings',
