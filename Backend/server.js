@@ -81,13 +81,13 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  // console.log('\n' + '═'.repeat(50));
-  // console.log('🚀 Leafy Backend Server Started!');
-  // console.log('═'.repeat(50));
-  // console.log(`📍 Server running on: http://localhost:${PORT}`);
-  // console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
-  // console.log(`📅 Started at: ${new Date().toLocaleString()}`);
-  // console.log('═'.repeat(50) + '\n');
+  console.log('\n' + '═'.repeat(50));
+  console.log('🚀 Leafy Backend Server Started!');
+  console.log('═'.repeat(50));
+  console.log(`📍 Server running on: http://localhost:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📅 Started at: ${new Date().toLocaleString()}`);
+  console.log('═'.repeat(50) + '\n');
 });
 
 /**
