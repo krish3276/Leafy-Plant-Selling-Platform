@@ -26,7 +26,13 @@ import {
   resetNotificationPreferences,
   getNotificationPreferencesSummary,
 } from '../controllers/adminController.js';
+import {
+  uploadProductImage,
+  updateProductImage,
+  deleteProductImage,
+} from '../controllers/uploadController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { upload } from '../config/cloudinary.js';
 
 const router = express.Router();
 
@@ -41,6 +47,11 @@ router.get('/products', getAllProductsAdmin);
 router.post('/products', createProductAdmin);
 router.put('/products/:id', updateProductAdmin);
 router.delete('/products/:id', deleteProductAdmin);
+
+// Image Upload Routes
+router.post('/upload-image', upload.single('image'), uploadProductImage);
+router.put('/products/:id/upload-image', upload.single('image'), updateProductImage);
+router.delete('/products/:id/image', deleteProductImage);
 
 // User Management
 router.get('/users', getAllUsers);

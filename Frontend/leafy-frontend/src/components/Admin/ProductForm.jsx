@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import './ProductForm.css';
+import ImageUploader from '../ImageUploader';
 
 function ProductForm({ product, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,13 @@ function ProductForm({ product, onClose, onSuccess }) {
   });
 
   const token = localStorage.getItem('authToken');
+
+  const handleImageUpload = (imageUrl) => {
+    setFormData({
+      ...formData,
+      image: imageUrl,
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -217,14 +225,12 @@ function ProductForm({ product, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="image">Image URL</label>
-            <input
-              type="url"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="https://..."
+            <label>Product Image</label>
+            <ImageUploader
+              onImageUpload={handleImageUpload}
+              initialImage={formData.image}
+              productId={product?._id}
+              token={token}
             />
           </div>
 

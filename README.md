@@ -46,4 +46,5 @@ but also helps users take better care of them using AI assistance.
 
 ## 👨‍💻 Author
 Krish Sirsath
+Maitri Soni
 
