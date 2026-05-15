@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductDetail';
 import PlantCare from './pages/PlantCare';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import FAQs from './pages/FAQs';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
@@ -41,6 +42,7 @@ function App() {
         <Route path="plant-care" element={<PlantCare />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="faqs" element={<FAQs />} />
         <Route path="cart" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
         <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />

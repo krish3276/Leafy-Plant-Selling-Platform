@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Mail, 
   Phone, 
@@ -309,7 +310,7 @@ function Contact() {
             <div className="faq-box">
               <h4>Looking for Quick Answers?</h4>
               <p>Visit our FAQ section for instant solutions to common questions.</p>
-              <a href="/plant-care" className="faq-link">View FAQs →</a>
+              <Link to="/faqs" className="faq-link">View FAQs →</Link>
             </div>
           </div>
         </div>
