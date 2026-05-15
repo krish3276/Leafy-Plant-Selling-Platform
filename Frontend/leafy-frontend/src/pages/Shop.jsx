@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useParams } from 'react-router-dom';
+import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, Loader2 } from 'lucide-react';
 import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
 function Shop() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { category } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addingToCart, setAddingToCart] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [searchInput, setSearchInput] = useState('');
   const [filters, setFilters] = useState({
     category: '',
     search: '',
@@ -23,12 +25,27 @@ function Shop() {
     fetchProducts();
   }, [filters]);
 
-  // Sync filters.category with the URL param when route changes
   useEffect(() => {
-    // category will be undefined on /shop route, so normalize to empty string
+    const searchParams = new URLSearchParams(location.search);
+    const routeSearch = searchParams.get('search') || '';
     const routeCategory = category || '';
-    setFilters((prev) => (prev.category === routeCategory ? prev : { ...prev, category: routeCategory }));
-  }, [category]);
+
+    setSearchInput(routeSearch);
+
+    setFilters((prev) => {
+      const nextFilters = {
+        ...prev,
+        category: routeCategory,
+        search: routeSearch,
+      };
+
+      if (prev.category === nextFilters.category && prev.search === nextFilters.search) {
+        return prev;
+      }
+
+      return nextFilters;
+    });
+  }, [category, location.search]);
 
   const fetchProducts = async () => {
     try {
@@ -52,14 +69,30 @@ function Shop() {
     setFilters({ ...filters, category: newCategory });
     // Keep URL in sync with selected category
     if (newCategory) {
-      navigate(`/shop/${newCategory}`);
+      navigate(filters.search ? `/shop/${newCategory}?search=${encodeURIComponent(filters.search)}` : `/shop/${newCategory}`);
     } else {
-      navigate('/shop');
+      navigate(filters.search ? `/shop?search=${encodeURIComponent(filters.search)}` : '/shop');
     }
   };
 
   const handleSearchChange = (e) => {
-    setFilters({ ...filters, search: e.target.value });
+    setSearchInput(e.target.value);
+  };
+
+  const applySearch = () => {
+    const nextSearch = searchInput.trim();
+    setFilters({ ...filters, search: nextSearch });
+
+    if (filters.category) {
+      navigate(nextSearch ? `/shop/${filters.category}?search=${encodeURIComponent(nextSearch)}` : `/shop/${filters.category}`);
+    } else {
+      navigate(nextSearch ? `/shop?search=${encodeURIComponent(nextSearch)}` : '/shop');
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    applySearch();
   };
 
   const handleSortChange = (e) => {
@@ -139,17 +172,20 @@ function Shop() {
 
       {/* Filters Section */}
       <div className="shop-filters">
-        <div className="filter-group">
-          <input
-            type="text"
-            placeholder="Search plants..."
-            value={filters.search}
-            onChange={handleSearchChange}
-            className="search-input"
-          />
+        <div className="filter-group search-filter-group">
+          <form className="search-form" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              placeholder="Search plants..."
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+            <button type="submit" className="search-btn">Search</button>
+          </form>
         </div>
 
-        <div className="filter-group">
+        <div className="filter-group category-filter-group">
           <label>Category:</label>
           <div className="category-buttons">
             <button
@@ -185,7 +221,7 @@ function Shop() {
           </div>
         </div>
 
-        <div className="filter-group">
+        <div className="filter-group sort-filter-group">
           <label>Sort by:</label>
           <select value={filters.sort} onChange={handleSortChange}>
             <option value="newest">Newest</option>

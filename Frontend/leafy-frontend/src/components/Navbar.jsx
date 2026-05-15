@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { cartAPI } from '../utils/api';
 import './Navbar.css';
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchCartCount = async () => {
     const token = localStorage.getItem('authToken');
@@ -61,6 +63,21 @@ function Navbar() {
     };
   }, []);
 
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+
+    const trimmedTerm = searchTerm.trim();
+
+    if (!trimmedTerm) {
+      return;
+    }
+
+    const searchPath = `/shop?search=${encodeURIComponent(trimmedTerm)}`;
+    navigate(searchPath);
+    setIsSearchOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -71,15 +88,20 @@ function Navbar() {
         </Link>
 
         {/* Search Bar - Hidden on very small screens */}
-        <div className={`search-container ${isSearchOpen ? 'active' : ''}`}>
-          <Search size={20} className="search-icon" />
+        <form className={`search-container ${isSearchOpen ? 'active' : ''}`} onSubmit={handleSearchSubmit}>
+          <button type="submit" className="search-icon-button" aria-label="Search plants">
+            <Search size={20} className="search-icon" />
+          </button>
           <input
             type="text"
             placeholder="Search for plants..."
             className="search-input"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            onFocus={() => setIsSearchOpen(true)}
             onBlur={() => setIsSearchOpen(false)}
           />
-        </div>
+        </form>
 
         {/* Navigation Links - Hidden on mobile */}
         <div className="nav-links">
