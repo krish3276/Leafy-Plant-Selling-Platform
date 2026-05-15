@@ -14,7 +14,6 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
-import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 
 function CustomerLayout() {
@@ -31,7 +30,6 @@ function App() {
   return (
     <Routes>
       {/* Admin Routes - No Navbar/Footer */}
-      <Route path="admin/login" element={<AdminLogin />} />
       <Route path="admin/dashboard" element={<AdminDashboard />} />
 
       {/* Customer Routes - With Navbar/Footer */}

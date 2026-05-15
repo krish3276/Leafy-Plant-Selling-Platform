@@ -57,7 +57,7 @@ function AdminSidebar({ activeTab, setActiveTab, sidebarOpen, user }) {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    navigate('/admin/login');
+    navigate('/login');
   };
 
   return (

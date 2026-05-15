@@ -36,13 +36,13 @@ function AdminDashboard() {
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
-      navigate('/admin/login');
+      navigate('/login');
       return;
     }
 
     const parsedUser = JSON.parse(userData);
     if (parsedUser.role !== 'admin') {
-      navigate('/admin/login');
+      navigate('/login');
       return;
     }
 
@@ -65,7 +65,7 @@ function AdminDashboard() {
         if (response.status === 401) {
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
-          navigate('/admin/login');
+          navigate('/login');
           return;
         }
         setError(data.message || 'Failed to load dashboard');
@@ -85,7 +85,7 @@ function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    navigate('/admin/login');
+    navigate('/login');
   };
 
   const toggleSidebar = () => {

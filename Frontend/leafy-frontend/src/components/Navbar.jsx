@@ -115,9 +115,9 @@ function Navbar() {
           <Link to={isLoggedIn ? "/account" : "/login"} className="icon-link">
             <User size={22} />
           </Link>
-          <Link to="/admin/login" className="admin-link" title="Admin Portal">
+          {/* <Link to="/login" className="admin-link" title="Admin Portal">
             🔐
-          </Link>
+          </Link> */}
 
           {/* Hamburger Menu - Visible only on mobile */}
           <button

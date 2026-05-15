@@ -21,9 +21,12 @@ function Login() {
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        // Show success message
-        alert('Login successful! Welcome back!');
-        window.location.href = '/account';
+        // Redirect based on role
+        if (data.user?.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else {
+          window.location.href = '/account';
+        }
       } else {
         alert('Invalid email or password');
       }
