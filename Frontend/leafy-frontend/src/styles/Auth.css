@@ -213,6 +213,24 @@
   margin-bottom: 2rem;
 }
 
+.google-auth-button-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.google-auth-button-wrap > div {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.google-auth-button-wrap iframe {
+  margin: 0 auto;
+}
+
 .oauth-button {
   display: flex;
   align-items: center;
@@ -291,6 +309,10 @@
 
   .oauth-buttons {
     grid-template-columns: 1fr;
+  }
+
+  .google-auth-button-wrap {
+    grid-column: auto;
   }
 
   .auth-container {

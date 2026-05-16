@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import { OAuth2Client } from 'google-auth-library';
+import crypto from 'crypto';
 import { validationResult } from 'express-validator';
 
 export const signup = async (req, res) => {
@@ -130,6 +132,73 @@ export const login = async (req, res) => {
       message: 'Server error. Please try again later.',
       error: error.message,
     });
+  }
+};
+
+/**
+ * ROUTE: POST /api/auth/google
+ * PURPOSE: Verify Google ID token, create or find user, return app JWT
+ * BODY: { token }
+ */
+export const googleAuth = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'No token provided' });
+    }
+
+    const CLIENT_ID = '338861078181-dgut27q6gn1vr4e57oau439ch581jntf.apps.googleusercontent.com';
+    const client = new OAuth2Client(CLIENT_ID);
+
+    // Verify the token
+    const ticket = await client.verifyIdToken({ idToken: token, audience: CLIENT_ID });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      return res.status(400).json({ success: false, message: 'Invalid Google token payload' });
+    }
+
+    const email = payload.email.toLowerCase();
+    const name = payload.name || '';
+    const picture = payload.picture || '';
+
+    // Split name into first/last
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts.shift() || 'User';
+    const lastName = nameParts.join(' ') || 'Google';
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create a random password for social-login users (will be hashed by model middleware)
+      const randomPassword = crypto.randomBytes(16).toString('hex');
+
+      user = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: randomPassword,
+      });
+    }
+
+    // Generate JWT for our app
+    const appToken = user.generateAuthToken();
+
+    return res.status(200).json({
+      success: true,
+      token: appToken,
+      user: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    return res.status(500).json({ success: false, message: 'Google authentication failed', error: error.message });
   }
 };
 

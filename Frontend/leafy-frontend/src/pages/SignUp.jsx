@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, User, Chrome, Facebook, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import '../styles/Auth.css';
 
 function SignUp() {
@@ -8,6 +8,75 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleGoogleSignUp = async (response) => {
+    const token = response?.credential;
+    if (!token) {
+      setError('Google sign up failed. No credential received.');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        localStorage.setItem('authToken', data.token || '');
+        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = '/account';
+        return;
+      }
+
+      setError(data.message || 'Google sign up failed. Please try again.');
+    } catch (err) {
+      console.error('Google sign up error:', err);
+      setError('Connection error. Please check if backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.src = 'https://accounts.google.com/gsi/client';
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      if (!window.google) return;
+
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleSignUp,
+      });
+
+      const buttonContainer = document.getElementById('google-signup-button');
+      if (buttonContainer) {
+        buttonContainer.innerHTML = '';
+        window.google.accounts.id.renderButton(buttonContainer, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signup_with',
+          width: 300,
+        });
+      }
+    };
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,14 +153,6 @@ function SignUp() {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    alert('Google sign up coming soon!');
-  };
-
-  const handleFacebookSignUp = () => {
-    alert('Facebook sign up coming soon!');
-  };
-
   return (
     <div className="auth-container">
         <div className="auth-card">
@@ -103,24 +164,9 @@ function SignUp() {
           {error && <div className="error-message">{error}</div>}
 
           <div className="oauth-buttons">
-            <button
-              type="button"
-              className="oauth-button google"
-              onClick={handleGoogleSignUp}
-              disabled={loading}
-            >
-              <Chrome size={18} />
-              <span>Google</span>
-            </button>
-            <button
-              type="button"
-              className="oauth-button facebook"
-              onClick={handleFacebookSignUp}
-              disabled={loading}
-            >
-              <Facebook size={18} />
-              <span>Facebook</span>
-            </button>
+            <div className="google-auth-button-wrap">
+              <div id="google-signup-button"></div>
+            </div>
           </div>
 
           <div className="divider">

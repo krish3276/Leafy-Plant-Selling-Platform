@@ -1,9 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, Chrome, Facebook } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import '../styles/Auth.css';
 
 function Login() {
+  useEffect(() => {
+    // Load Google SDK
+    const script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.src = 'https://accounts.google.com/gsi/client';
+    document.head.appendChild(script);
+
+    // Initialize Google Sign-In after script loads
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSuccess,
+        });
+
+        // Render the Google Sign-In button
+        const buttonContainer = document.getElementById('google-signin-button');
+        if (buttonContainer && window.google) {
+          window.google.accounts.id.renderButton(buttonContainer, {
+            theme: 'outline',
+            size: 'large',
+            width: 300,
+          });
+        }
+      }
+    };
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -36,12 +71,35 @@ function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    alert('Google login coming soon!');
-  };
+  const handleGoogleSuccess = async (response) => {
+    const token = response?.credential;
+    if (!token) {
+      console.error('No credential returned from Google');
+      return;
+    }
 
-  const handleFacebookLogin = () => {
-    alert('Facebook login coming soon!');
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('authToken', data.token || data.authToken || '');
+          if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+          window.location.href = '/';
+          return;
+        }
+      }
+
+      alert('Google login failed on the server.');
+    } catch (err) {
+      console.error('Google login error:', err);
+      alert('Google login failed. Please try again.');
+    }
   };
 
   return (
@@ -97,22 +155,9 @@ function Login() {
           </div>
 
           <div className="oauth-buttons">
-            <button
-              type="button"
-              className="oauth-button google"
-              onClick={handleGoogleLogin}
-            >
-              <Chrome size={20} />
-              <span>Google</span>
-            </button>
-            <button
-              type="button"
-              className="oauth-button facebook"
-              onClick={handleFacebookLogin}
-            >
-              <Facebook size={20} />
-              <span>Facebook</span>
-            </button>
+            <div className="google-auth-button-wrap">
+              <div id="google-signin-button"></div>
+            </div>
           </div>
 
           <div className="auth-footer">

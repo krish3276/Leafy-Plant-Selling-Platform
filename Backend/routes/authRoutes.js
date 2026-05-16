@@ -5,6 +5,7 @@ import {
   getProfile,
   updateProfile,
   addToWishlist,
+  googleAuth,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import {
@@ -94,6 +95,7 @@ router.post('/wishlist/:productId', protect, addToWishlist);
  * }
  */
 router.put('/profile', protect, updateProfileValidation, updateProfile);
+router.post('/google', googleAuth);
 
 // Export router to use in server.js
 export default router;
