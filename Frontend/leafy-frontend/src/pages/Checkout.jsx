@@ -4,6 +4,15 @@ import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
 import { cartAPI } from '../utils/api';
 import '../styles/Checkout.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatPrice = (value) => priceFormatter.format(Number(value || 0));
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
 function Checkout() {
@@ -341,7 +350,7 @@ function Checkout() {
                     <p className="item-qty">Qty: {item.quantity}</p>
                   </div>
                   <p className="item-price">
-                    ${(product.price * item.quantity).toFixed(2)}
+                    {formatPrice(product.price * item.quantity)}
                   </p>
                 </div>
               );
@@ -352,22 +361,22 @@ function Checkout() {
 
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{formatPrice(subtotal)}</span>
           </div>
           <div className="summary-row">
             <span>Tax (8%)</span>
-            <span>${tax.toFixed(2)}</span>
+            <span>{formatPrice(tax)}</span>
           </div>
           <div className="summary-row">
             <span>Shipping</span>
-            <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+            <span>{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
           </div>
 
           <div className="summary-divider"></div>
 
           <div className="summary-row total">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>{formatPrice(total)}</span>
           </div>
 
           <button
@@ -376,7 +385,7 @@ function Checkout() {
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? 'Placing Order...' : `Place Order - $${total.toFixed(2)}`}
+            {submitting ? 'Placing Order...' : `Place Order - ${formatPrice(total)}`}
           </button>
 
           <div className="secure-checkout">

@@ -18,6 +18,13 @@ import {
 import { authAPI, productAPI, cartAPI } from '../utils/api';
 import '../styles/ProductDetail.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -251,7 +258,7 @@ function ProductDetail() {
             </span>
           </div>
 
-          <p className="product-price">${product.price.toFixed(2)}</p>
+          <p className="product-price">{priceFormatter.format(Number(product.price || 0))}</p>
 
           <p className="product-description">{product.description}</p>
 
@@ -405,7 +412,7 @@ function ProductDetail() {
           <div className="shipping-info">
             <div className="shipping-item">
               <Truck size={18} />
-              <span>Free shipping on orders over $50</span>
+              <span>Free shipping on orders over ₹50</span>
             </div>
             <div className="shipping-item">
               <Shield size={18} />

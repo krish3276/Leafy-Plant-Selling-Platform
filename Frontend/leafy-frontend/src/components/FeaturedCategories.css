@@ -1,5 +1,5 @@
 .featured-categories {
-  padding: 5rem 2rem;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 3vw, 2rem);
   background-color: white;
 }
 
@@ -15,7 +15,7 @@
 
 .section-title {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 3rem;
@@ -77,6 +77,32 @@
 
 @media (max-width: 768px) {
   .categories-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .featured-categories {
+    padding-inline: 1rem;
+  }
+
+  .section-title {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-image {
+    height: 220px;
+  }
+
+  .category-info {
+    padding: 1.25rem;
+  }
+
+  .category-title {
+    font-size: 1.15rem;
   }
 }

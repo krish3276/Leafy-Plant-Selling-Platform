@@ -3,14 +3,15 @@
 .account-container {
   background: #f5f5f5;
   min-height: calc(100vh - 80px);
-  padding: 2rem 1rem;
+  padding: clamp(1rem, 2vw, 2rem) 0.75rem;
+  overflow-x: hidden;
 }
 
 .account-wrapper {
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
   gap: 2rem;
   align-items: start;
 }
@@ -117,6 +118,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 2.5rem;
   min-height: 600px;
+  min-width: 0;
 }
 
 .content-section {
@@ -222,6 +224,7 @@
   font-weight: 600;
   color: #1a1a1a;
   margin: 0 0 0.25rem 0;
+  overflow-wrap: anywhere;
 }
 
 .order-date {
@@ -335,6 +338,7 @@
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .btn-track {
@@ -397,6 +401,7 @@
   margin: 0;
   color: #1a1a1a;
   font-size: 1.4rem;
+  overflow-wrap: anywhere;
 }
 
 .tracking-close-btn {
@@ -459,6 +464,7 @@
 .tracking-order-meta strong {
   color: #1a1a1a;
   font-size: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .tracking-steps {
@@ -725,6 +731,7 @@
 .garden-card-header h4 {
   margin: 0 0 0.25rem;
   color: #1a1a1a;
+  overflow-wrap: anywhere;
 }
 
 .garden-card-header p {
@@ -869,6 +876,7 @@
 .garden-modal-header h3 {
   margin: 0;
   font-size: 1.5rem;
+  overflow-wrap: anywhere;
 }
 
 .garden-modal-top {
@@ -1263,8 +1271,20 @@
 }
 
 @media (max-width: 768px) {
+  .account-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .account-sidebar {
+    position: static;
+  }
+
+  .account-main {
+    padding: 1.5rem 1rem;
+  }
+
   .section-header-simple h2 {
-    font-size: 1.5rem;
+    font-size: clamp(1.5rem, 5vw, 1.85rem);
   }
 
   .edit-actions {
@@ -1317,9 +1337,18 @@
     padding: 1.25rem;
   }
 
+  .order-header,
+  .order-body,
+  .order-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .order-items {
+    width: 100%;
     gap: 0.75rem;
     overflow-x: auto;
+    padding-bottom: 0.25rem;
   }
 
   .order-item-thumb {
@@ -1334,12 +1363,15 @@
 
   .order-filters {
     gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
   }
 
   .filter-btn {
     padding: 0.5rem 1rem;
-    font-size: 0.87;
+    font-size: 0.87rem;
     justify-content: center;
+    flex: 0 0 auto;
   }
 
   .account-stats {
@@ -1357,6 +1389,15 @@
 
   .tracking-modal {
     padding: 1.1rem;
+  }
+
+  .tracking-summary,
+  .tracking-order-meta,
+  .garden-summary-grid,
+  .garden-layout,
+  .garden-care-grid,
+  .garden-modal-top {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1377,6 +1418,17 @@
   .nav-item {
     padding: 0.875rem 1rem;
     font-size: 0.9375rem;
+  }
+
+  .tracking-modal,
+  .garden-modal {
+    padding: 1rem;
+  }
+
+  .order-info h3,
+  .profile-email,
+  .detail-value {
+    overflow-wrap: anywhere;
   }
 
   .wishlist-meta {

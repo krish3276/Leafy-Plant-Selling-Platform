@@ -4,6 +4,15 @@ import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucid
 import { cartAPI } from '../utils/api';
 import '../styles/Cart.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatPrice = (value) => priceFormatter.format(Number(value || 0));
+
 function Cart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
@@ -185,7 +194,7 @@ function Cart() {
                 <div className="cart-item-details">
                   <h3 className="cart-item-name">{product.name}</h3>
                   <p className="cart-item-category">{product.category}</p>
-                  <p className="cart-item-price">${product.price?.toFixed(2)}</p>
+                  <p className="cart-item-price">{formatPrice(product.price)}</p>
                 </div>
 
                 <div className="cart-item-quantity">
@@ -207,7 +216,7 @@ function Cart() {
                 </div>
 
                 <div className="cart-item-total">
-                  <p>${(product.price * item.quantity).toFixed(2)}</p>
+                  <p>{formatPrice(product.price * item.quantity)}</p>
                 </div>
 
                 <button
@@ -240,17 +249,17 @@ function Cart() {
           
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{formatPrice(subtotal)}</span>
           </div>
           
           <div className="summary-row">
             <span>Tax (8%)</span>
-            <span>${tax.toFixed(2)}</span>
+            <span>{formatPrice(tax)}</span>
           </div>
           
           <div className="summary-row">
             <span>Shipping</span>
-            <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+            <span>{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
           </div>
           
           {shipping === 0 && (
@@ -261,7 +270,7 @@ function Cart() {
           
           {shipping > 0 && (
             <div className="shipping-note">
-              Add ${(50 - subtotal).toFixed(2)} more for free shipping
+              Add {formatPrice(50 - subtotal)} more for free shipping
             </div>
           )}
           
@@ -269,7 +278,7 @@ function Cart() {
           
           <div className="summary-row total">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>{formatPrice(total)}</span>
           </div>
 
           <Link to="/checkout" className="checkout-btn">

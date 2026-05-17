@@ -7,6 +7,13 @@ import {
 } from 'lucide-react';
 import './AdminStats.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function AdminStats({ dashboardData, setActiveTab, setUserRoleFilter }) {
   const { stats, lowStockProducts, recentProducts } = dashboardData;
 
@@ -122,7 +129,7 @@ function AdminStats({ dashboardData, setActiveTab, setUserRoleFilter }) {
                       <td>
                         <span className="stock-badge low">{product.stock}</span>
                       </td>
-                      <td>${product.price.toFixed(2)}</td>
+                      <td>{priceFormatter.format(Number(product.price || 0))}</td>
                     </tr>
                   ))
                 ) : (
@@ -165,7 +172,7 @@ function AdminStats({ dashboardData, setActiveTab, setUserRoleFilter }) {
                     >
                       <td className="product-name">{product.name}</td>
                       <td>{product.category}</td>
-                      <td>${product.price.toFixed(2)}</td>
+                      <td>{priceFormatter.format(Number(product.price || 0))}</td>
                       <td>
                         <span className={`status-badge ${product.isActive ? 'active' : 'inactive'}`}>
                           {product.isActive ? 'Active' : 'Inactive'}

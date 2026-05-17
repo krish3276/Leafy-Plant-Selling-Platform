@@ -19,6 +19,13 @@ const API_BASE = 'http://localhost:5000/api/orders';
 const orderStatusOptions = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 const paymentStatusOptions = ['pending', 'paid', 'failed', 'refunded'];
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function OrdersManagement() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -209,10 +216,7 @@ function OrdersManagement() {
 
   const formatMoney = (value) => {
     const amount = Number(value || 0);
-    return amount.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    });
+    return priceFormatter.format(amount);
   };
 
   const formatDate = (dateValue) => {

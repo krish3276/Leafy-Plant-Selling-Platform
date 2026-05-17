@@ -1,5 +1,5 @@
 .newsletter {
-  padding: 4rem 2rem;
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
   background-color: #e8ede9;
 }
 
@@ -10,14 +10,14 @@
 }
 
 .newsletter-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 1rem;
 }
 
 .newsletter-description {
-  font-size: 1.05rem;
+  font-size: clamp(0.98rem, 2.2vw, 1.05rem);
   color: #666;
   margin-bottom: 2rem;
   line-height: 1.6;
@@ -69,5 +69,21 @@
 
   .newsletter-button {
     width: 100%;
+  }
+
+  .newsletter {
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletter-title {
+    font-size: 1.7rem;
+  }
+
+  .newsletter-input,
+  .newsletter-button {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

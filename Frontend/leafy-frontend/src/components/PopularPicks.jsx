@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import './PopularPicks.css';
 import { productAPI } from '../utils/api';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function PopularPicks() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +70,7 @@ function PopularPicks() {
               </div>
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">${product.price.toFixed(2)}</p>
+                <p className="product-price">{priceFormatter.format(Number(product.price))}</p>
               </div>
             </div>
           ))}

@@ -3,6 +3,13 @@ import { Plus, Edit2, Trash2, Search, AlertCircle } from 'lucide-react';
 import './ProductManagement.css';
 import ProductForm from './ProductForm';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function ProductManagement({ initialProductId = '' }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -350,7 +357,7 @@ function ProductManagement({ initialProductId = '' }) {
                       >
                         <td>{product.name}</td>
                         <td>{product.category}</td>
-                        <td>${product.price.toFixed(2)}</td>
+                        <td>{priceFormatter.format(Number(product.price || 0))}</td>
                         <td>
                           <span className={`stock-badge ${product.stock < 10 ? 'low' : product.stock < 30 ? 'medium' : 'high'}`}>
                             {product.stock}
