@@ -90,7 +90,50 @@ function About() {
           </div>
           <div className="story-image">
             <div className="story-image-placeholder">
-              <Leaf size={80} className="placeholder-icon" />
+              <svg className="growing-plant" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                {/* Soil */}
+                <ellipse cx="100" cy="240" rx="60" ry="15" fill="#8B7355" opacity="0.8" />
+                <rect x="40" y="240" width="120" height="30" fill="#A0826D" opacity="0.6" />
+                
+                {/* Main Stem */}
+                <line x1="100" y1="240" x2="100" y2="140" stroke="#4CAF50" strokeWidth="4" className="stem" strokeLinecap="round" />
+                
+                {/* Left Branch 1 */}
+                <g className="branch branch-1">
+                  <line x1="100" y1="180" x2="70" y2="160" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
+                  <ellipse cx="65" cy="155" rx="8" ry="12" fill="#81C784" opacity="0.9" />
+                  <ellipse cx="62" cy="148" rx="7" ry="10" fill="#81C784" opacity="0.85" />
+                </g>
+                
+                {/* Right Branch 1 */}
+                <g className="branch branch-2">
+                  <line x1="100" y1="180" x2="130" y2="160" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
+                  <ellipse cx="135" cy="155" rx="8" ry="12" fill="#81C784" opacity="0.9" />
+                  <ellipse cx="138" cy="148" rx="7" ry="10" fill="#81C784" opacity="0.85" />
+                </g>
+                
+                {/* Left Branch 2 */}
+                <g className="branch branch-3">
+                  <line x1="100" y1="160" x2="65" y2="140" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
+                  <ellipse cx="60" cy="135" rx="8" ry="12" fill="#66BB6A" opacity="0.95" />
+                  <ellipse cx="55" cy="128" rx="7" ry="10" fill="#81C784" opacity="0.9" />
+                  <ellipse cx="58" cy="122" rx="6" ry="9" fill="#81C784" opacity="0.85" />
+                </g>
+                
+                {/* Right Branch 2 */}
+                <g className="branch branch-4">
+                  <line x1="100" y1="160" x2="135" y2="140" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
+                  <ellipse cx="140" cy="135" rx="8" ry="12" fill="#66BB6A" opacity="0.95" />
+                  <ellipse cx="145" cy="128" rx="7" ry="10" fill="#81C784" opacity="0.9" />
+                  <ellipse cx="142" cy="122" rx="6" ry="9" fill="#81C784" opacity="0.85" />
+                </g>
+                
+                {/* Top Leaves */}
+                <g className="branch branch-5">
+                  <ellipse cx="90" cy="130" rx="9" ry="14" fill="#4CAF50" opacity="0.95" transform="rotate(-35 90 130)" />
+                  <ellipse cx="110" cy="130" rx="9" ry="14" fill="#4CAF50" opacity="0.95" transform="rotate(35 110 130)" />
+                </g>
+              </svg>
             </div>
           </div>
         </div>

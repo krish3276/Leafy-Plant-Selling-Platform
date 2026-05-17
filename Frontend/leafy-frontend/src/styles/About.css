@@ -140,16 +140,61 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
-.placeholder-icon {
-  animation: float 3s ease-in-out infinite;
+.growing-plant {
+  width: 200px;
+  height: 280px;
+  animation: plantGrow 3.5s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
+.stem {
+  animation: stemGrow 2s ease-out forwards;
+  transform-origin: 100px 240px;
+}
+
+.branch {
+  opacity: 0;
+  animation: branchGrow 0.6s ease-out forwards;
+}
+
+.branch-1 { animation-delay: 1.2s; }
+.branch-2 { animation-delay: 1.4s; }
+.branch-3 { animation-delay: 1.8s; }
+.branch-4 { animation-delay: 2s; }
+.branch-5 { animation-delay: 2.4s; }
+
+@keyframes stemGrow {
+  0% {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0%, 100% 0%, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes branchGrow {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes plantGrow {
+  0% {
+    filter: drop-shadow(0 10px 20px rgba(45, 90, 39, 0.15));
   }
   50% {
-    transform: translateY(-20px);
+    filter: drop-shadow(0 15px 30px rgba(45, 90, 39, 0.25));
+  }
+  100% {
+    filter: drop-shadow(0 10px 20px rgba(45, 90, 39, 0.15));
   }
 }
 
