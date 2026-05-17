@@ -127,15 +127,15 @@ function OrderConfirmation() {
             <Package size={20} />
             Order Items
           </h2>
-          <div className="order-items">
+          <div className="confirmation-order-items">
             {order.items.map((item, index) => (
-              <div key={index} className="order-item">
+              <div key={index} className="confirmation-order-item">
                 <img src={item.image} alt={item.name} />
-                <div className="item-info">
+                <div className="confirmation-item-info">
                   <h3>{item.name}</h3>
                   <p>Quantity: {item.quantity}</p>
                 </div>
-                <p className="item-price">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="confirmation-item-price">${(item.price * item.quantity).toFixed(2)}</p>
               </div>
             ))}
           </div>
