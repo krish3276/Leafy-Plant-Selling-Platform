@@ -104,9 +104,15 @@ export const createProductAdmin = async (req, res) => {
       });
     }
 
+    const productData = { ...req.body, isActive: true };
+
+    if (productData.category === 'accessories') {
+      productData.difficulty = null;
+      productData.sunlight = null;
+    }
+
     const product = await Product.create({
-      ...req.body,
-      isActive: true,
+      ...productData,
     });
 
     res.status(201).json({
@@ -136,7 +142,14 @@ export const updateProductAdmin = async (req, res) => {
       });
     }
 
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+
+    if ((updateData.category || product.category) === 'accessories') {
+      updateData.difficulty = null;
+      updateData.sunlight = null;
+    }
+
+    product = await Product.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

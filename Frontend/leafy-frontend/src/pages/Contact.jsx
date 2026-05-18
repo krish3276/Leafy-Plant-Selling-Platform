@@ -230,6 +230,16 @@ function Contact() {
                   </>
                 )}
               </button>
+              {/* Embedded Google Map below the Send Message button */}
+              <div className="map-embed">
+                <iframe
+                  title="Leafy Location"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent('123 Green Street, Plant City, PC 12345')}&output=embed`}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
             </form>
           </div>
 

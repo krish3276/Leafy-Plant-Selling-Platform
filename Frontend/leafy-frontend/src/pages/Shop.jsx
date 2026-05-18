@@ -267,7 +267,7 @@ function Shop() {
                   <p className="product-category">{product.category}</p>
                   <p className="product-price">{priceFormatter.format(Number(product.price || 0))}</p>
                   
-                  {filters.category !== 'accessories' ? (
+                  {product.category !== 'accessories' ? (
                     <div className="product-meta">
                       <span className="difficulty">
                         🌱 {product.difficulty || 'Medium'}

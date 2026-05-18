@@ -16,9 +16,13 @@ function ProductForm({ product, onClose, onSuccess }) {
     sunlight: product?.sunlight || 'medium',
     waterFrequency: product?.waterFrequency || 'Once a week',
     size: product?.size || '',
+    toolType: product?.toolType || 'fertilizer',
+    warranty: product?.warranty || '1 Year',
     image: product?.image || '',
     isActive: product?.isActive !== false,
   });
+
+  const isAccessoryCategory = formData.category === 'accessories';
 
   const token = localStorage.getItem('authToken');
 
@@ -43,6 +47,18 @@ function ProductForm({ product, onClose, onSuccess }) {
     setError('');
 
     try {
+      const payload = { ...formData };
+
+      if (payload.category === 'accessories') {
+        delete payload.difficulty;
+        delete payload.sunlight;
+        delete payload.waterFrequency;
+        delete payload.size;
+      } else {
+        delete payload.toolType;
+        delete payload.warranty;
+      }
+
       const url = product
         ? `http://localhost:5000/api/admin/products/${product._id}`
         : 'http://localhost:5000/api/admin/products';
@@ -55,7 +71,7 @@ function ProductForm({ product, onClose, onSuccess }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -168,61 +184,110 @@ function ProductForm({ product, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="difficulty">Difficulty Level</label>
-              <select
-                id="difficulty"
-                name="difficulty"
-                value={formData.difficulty}
-                onChange={handleChange}
-              >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
+          {!isAccessoryCategory && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="difficulty">Difficulty Level</label>
+                <select
+                  id="difficulty"
+                  name="difficulty"
+                  value={formData.difficulty}
+                  onChange={handleChange}
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="sunlight">Sunlight Requirement</label>
-              <select
-                id="sunlight"
-                name="sunlight"
-                value={formData.sunlight}
-                onChange={handleChange}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+              <div className="form-group">
+                <label htmlFor="sunlight">Sunlight Requirement</label>
+                <select
+                  id="sunlight"
+                  name="sunlight"
+                  value={formData.sunlight}
+                  onChange={handleChange}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="waterFrequency">Watering Frequency</label>
-              <input
-                type="text"
-                id="waterFrequency"
-                name="waterFrequency"
-                value={formData.waterFrequency}
-                onChange={handleChange}
-                placeholder="e.g., Once a week"
-              />
-            </div>
+          {!isAccessoryCategory && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="waterFrequency">Watering Frequency</label>
+                <input
+                  type="text"
+                  id="waterFrequency"
+                  name="waterFrequency"
+                  value={formData.waterFrequency}
+                  onChange={handleChange}
+                  placeholder="e.g., Once a week"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="size">Size</label>
-              <input
-                type="text"
-                id="size"
-                name="size"
-                value={formData.size}
-                onChange={handleChange}
-                placeholder="e.g., Small, Medium, Large"
-              />
+              <div className="form-group">
+                <label htmlFor="size">Size</label>
+                <input
+                  type="text"
+                  id="size"
+                  name="size"
+                  value={formData.size}
+                  onChange={handleChange}
+                  placeholder="e.g., Small, Medium, Large"
+                />
+              </div>
             </div>
-          </div>
+          )}
+
+          {isAccessoryCategory && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="toolType">Tool Type *</label>
+                <select
+                  id="toolType"
+                  name="toolType"
+                  value={formData.toolType}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="watering-can">Watering Can</option>
+                  <option value="pruning-shears">Pruning Shears</option>
+                  <option value="soil-mix">Soil Mix</option>
+                  <option value="pot">Pot</option>
+                  <option value="planter">Planter</option>
+                  <option value="stand">Stand</option>
+                  <option value="trellis">Trellis</option>
+                  <option value="mister">Mister</option>
+                  <option value="fertilizer">Fertilizer</option>
+                  <option value="gloves">Gloves</option>
+                  <option value="spade">Spade</option>
+                  <option value="rake">Rake</option>
+                  <option value="light">Light</option>
+                  <option value="thermometer">Thermometer</option>
+                  <option value="moisture-meter">Moisture Meter</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="warranty">Warranty *</label>
+                <input
+                  type="text"
+                  id="warranty"
+                  name="warranty"
+                  value={formData.warranty}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., 1 Year"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="form-group">
             <label>Product Image</label>

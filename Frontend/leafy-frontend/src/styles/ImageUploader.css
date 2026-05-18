@@ -131,17 +131,19 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 12px;
+  gap: 25px;
   background-color: white;
   padding: 12px 16px;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 70%;
 }
 
 .btn-upload,
 .btn-delete {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 8px 16px;
   border: none;
@@ -169,6 +171,7 @@
 .btn-delete:hover {
   background-color: #dc2626;
 }
+
 
 .btn-loading {
   display: inline-flex;
