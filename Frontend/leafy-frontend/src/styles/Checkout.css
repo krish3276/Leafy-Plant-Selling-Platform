@@ -3,8 +3,9 @@
 .checkout-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(1rem, 2vw, 2rem);
   min-height: 70vh;
+  overflow-x: hidden;
 }
 
 .back-link {
@@ -23,7 +24,7 @@
 }
 
 .checkout-title {
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 4vw, 2rem);
   color: #2d5a27;
   margin-bottom: 2rem;
 }
@@ -63,7 +64,7 @@
 
 .checkout-content {
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
   gap: 2rem;
   align-items: start;
 }
@@ -73,6 +74,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  min-width: 0;
 }
 
 .form-section {
@@ -231,6 +233,7 @@
 
 .summary-item .item-details {
   flex: 1;
+  min-width: 0;
 }
 
 .summary-item .item-name {
@@ -238,6 +241,7 @@
   color: #333;
   margin: 0 0 0.25rem;
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .summary-item .item-qty {
@@ -264,6 +268,7 @@
   align-items: center;
   margin-bottom: 0.75rem;
   color: #666;
+  gap: 1rem;
 }
 
 .summary-row.total {
@@ -324,11 +329,29 @@
     padding: 1rem;
   }
 
+  .checkout-title {
+    margin-bottom: 1.5rem;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }
 
   .payment-options {
     flex-direction: column;
+  }
+
+  .summary-items {
+    max-height: none;
+  }
+
+  .summary-item {
+    align-items: flex-start;
+  }
+
+  .summary-row,
+  .summary-item .item-name,
+  .summary-item .item-price {
+    overflow-wrap: anywhere;
   }
 }

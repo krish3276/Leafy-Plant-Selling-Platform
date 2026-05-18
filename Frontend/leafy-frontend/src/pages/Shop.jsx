@@ -4,6 +4,13 @@ import { Search, ShoppingCart, Loader2 } from 'lucide-react';
 import { productAPI, cartAPI } from '../utils/api';
 import '../styles/Shop.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function Shop() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -258,7 +265,7 @@ function Shop() {
                     <h3 className="product-name">{product.name}</h3>
                   </Link>
                   <p className="product-category">{product.category}</p>
-                  <p className="product-price">₹{product.price}</p>
+                  <p className="product-price">{priceFormatter.format(Number(product.price || 0))}</p>
                   
                   {filters.category !== 'accessories' ? (
                     <div className="product-meta">

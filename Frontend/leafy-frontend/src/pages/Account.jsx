@@ -4,6 +4,15 @@ import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, LogOut, ShoppingBa
 import { authAPI, orderAPI, gardenAPI } from '../utils/api';
 import '../styles/Account.css';
 
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatPrice = (value) => priceFormatter.format(Number(value || 0));
+
 function Account() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -568,7 +577,7 @@ function Account() {
                           <div className="order-footer">
                             <div className="order-total">
                               <span>Total</span>
-                              <h4>${Number(order.total || 0).toFixed(2)}</h4>
+                              <h4>{formatPrice(order.total)}</h4>
                             </div>
                             <button className="btn-track" onClick={() => openTrackingModal(order)}>
                               {getTrackingLabel(order.orderStatus)}
@@ -745,7 +754,7 @@ function Account() {
                           <span className="wishlist-category">{item.category}</span>
                           <h3>{item.name}</h3>
                           <div className="wishlist-meta">
-                            <span>${Number(item.price || 0).toFixed(2)}</span>
+                            <span>{formatPrice(item.price)}</span>
                             <span>{item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}</span>
                           </div>
                           <div className="wishlist-actions">
