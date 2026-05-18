@@ -1,6 +1,130 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Leaf, Heart, Award, Users, Sprout, Zap, BookOpen } from 'lucide-react';
 import '../styles/About.css';
+
+const growthStages = [
+  {
+    title: 'Seed',
+    description: 'A small seed settles into the soil and gathers energy.',
+  },
+  {
+    title: 'Sprout',
+    description: 'A tiny shoot pushes upward and reaches for the light.',
+  },
+  {
+    title: 'Stem',
+    description: 'The stem lengthens and steadies itself above the soil.',
+  },
+  {
+    title: 'Leaves',
+    description: 'Leaves unfold, opening the plant to the warmth of the sun.',
+  },
+  {
+    title: 'Plant',
+    description: 'A healthy young plant stands upright and gently sways.',
+  },
+];
+
+function GrowingPlantAnimation() {
+  const [stageIndex, setStageIndex] = useState(0);
+  const [replayToken, setReplayToken] = useState(0);
+
+  useEffect(() => {
+    const timers = [1200, 2800, 4600, 7000].map((delay, index) => (
+      window.setTimeout(() => setStageIndex(index + 1), delay)
+    ));
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [replayToken]);
+
+  const resetGrowth = () => {
+    setStageIndex(0);
+    setReplayToken((value) => value + 1);
+  };
+
+  const stage = growthStages[stageIndex];
+
+  return (
+    <div className="growing-plant-animation">
+      <div className="growth-sun" aria-hidden="true">
+        <span className="sun-core" />
+        <span className="sun-ray ray-1" />
+        <span className="sun-ray ray-2" />
+        <span className="sun-ray ray-3" />
+        <span className="sun-ray ray-4" />
+        <span className="sun-ray ray-5" />
+        <span className="sun-ray ray-6" />
+      </div>
+
+      <div className="growth-scene" aria-hidden="true">
+        <div className={`soil-bed stage-${stageIndex}`}>
+          <div className="soil-shadow" />
+          <div className="soil-mound" />
+
+          <div className={`seed ${stageIndex === 0 ? 'is-visible' : 'is-buried'}`} />
+
+          <div className={`sprout ${stageIndex >= 1 ? 'is-visible' : ''}`}>
+            <span className="sprout-stem" />
+            <span className="sprout-leaf sprout-leaf-left" />
+            <span className="sprout-leaf sprout-leaf-right" />
+          </div>
+
+          <svg
+            className={`plant-svg ${stageIndex >= 2 ? 'is-visible' : ''}`}
+            viewBox="0 0 220 220"
+            role="img"
+            aria-label="Growing plant"
+          >
+            <path
+              className={`stem-path ${stageIndex >= 2 ? 'draw' : ''}`}
+              d="M110 184 C109 156 108 136 110 118 C112 98 114 81 116 66"
+            />
+            <path
+              className={`branch-path branch-left ${stageIndex >= 2 ? 'draw' : ''}`}
+              d="M110 138 C96 128 84 116 73 102"
+            />
+            <path
+              className={`branch-path branch-right ${stageIndex >= 2 ? 'draw' : ''}`}
+              d="M112 132 C126 122 140 111 152 98"
+            />
+            <path
+              className={`leaf leaf-left ${stageIndex >= 3 ? 'bloom' : ''} ${stageIndex >= 4 ? 'sway' : ''}`}
+              d="M73 102 C50 96 41 76 52 63 C67 47 91 66 87 88 C84 96 79 100 73 102 Z"
+            />
+            <path
+              className={`leaf leaf-right ${stageIndex >= 3 ? 'bloom' : ''} ${stageIndex >= 4 ? 'sway' : ''}`}
+              d="M152 98 C175 91 185 71 174 59 C159 43 135 61 139 84 C142 92 147 96 152 98 Z"
+            />
+            <path
+              className={`leaf leaf-lower-left ${stageIndex >= 3 ? 'bloom' : ''} ${stageIndex >= 4 ? 'sway' : ''}`}
+              d="M108 144 C92 140 80 126 84 112 C89 97 108 104 114 121 C115 131 112 139 108 144 Z"
+            />
+            <path
+              className={`leaf leaf-lower-right ${stageIndex >= 3 ? 'bloom' : ''} ${stageIndex >= 4 ? 'sway' : ''}`}
+              d="M116 142 C132 138 145 125 141 111 C136 96 117 103 111 120 C110 130 112 138 116 142 Z"
+            />
+            <path
+              className={`leaf leaf-top ${stageIndex >= 3 ? 'bloom' : ''} ${stageIndex >= 4 ? 'sway' : ''}`}
+              d="M110 91 C100 77 101 58 112 50 C124 58 125 77 116 91 C114 94 111 94 110 91 Z"
+            />
+          </svg>
+
+          <div className={`watering-drop drop-one ${stageIndex >= 1 ? 'fall' : ''}`} />
+          <div className={`watering-drop drop-two ${stageIndex >= 2 ? 'fall' : ''}`} />
+        </div>
+      </div>
+
+      <div className="growth-caption">
+        <span className="growth-stage-badge">{stage.title}</span>
+        <p>{stage.description}</p>
+      </div>
+
+      <button type="button" className="growth-replay" onClick={resetGrowth}>
+        Replay Growth
+      </button>
+    </div>
+  );
+}
 
 function About() {
   const whyChooseUs = [
@@ -90,50 +214,7 @@ function About() {
           </div>
           <div className="story-image">
             <div className="story-image-placeholder">
-              <svg className="growing-plant" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
-                {/* Soil */}
-                <ellipse cx="100" cy="240" rx="60" ry="15" fill="#8B7355" opacity="0.8" />
-                <rect x="40" y="240" width="120" height="30" fill="#A0826D" opacity="0.6" />
-                
-                {/* Main Stem */}
-                <line x1="100" y1="240" x2="100" y2="140" stroke="#4CAF50" strokeWidth="4" className="stem" strokeLinecap="round" />
-                
-                {/* Left Branch 1 */}
-                <g className="branch branch-1">
-                  <line x1="100" y1="180" x2="70" y2="160" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
-                  <ellipse cx="65" cy="155" rx="8" ry="12" fill="#81C784" opacity="0.9" />
-                  <ellipse cx="62" cy="148" rx="7" ry="10" fill="#81C784" opacity="0.85" />
-                </g>
-                
-                {/* Right Branch 1 */}
-                <g className="branch branch-2">
-                  <line x1="100" y1="180" x2="130" y2="160" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
-                  <ellipse cx="135" cy="155" rx="8" ry="12" fill="#81C784" opacity="0.9" />
-                  <ellipse cx="138" cy="148" rx="7" ry="10" fill="#81C784" opacity="0.85" />
-                </g>
-                
-                {/* Left Branch 2 */}
-                <g className="branch branch-3">
-                  <line x1="100" y1="160" x2="65" y2="140" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
-                  <ellipse cx="60" cy="135" rx="8" ry="12" fill="#66BB6A" opacity="0.95" />
-                  <ellipse cx="55" cy="128" rx="7" ry="10" fill="#81C784" opacity="0.9" />
-                  <ellipse cx="58" cy="122" rx="6" ry="9" fill="#81C784" opacity="0.85" />
-                </g>
-                
-                {/* Right Branch 2 */}
-                <g className="branch branch-4">
-                  <line x1="100" y1="160" x2="135" y2="140" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" />
-                  <ellipse cx="140" cy="135" rx="8" ry="12" fill="#66BB6A" opacity="0.95" />
-                  <ellipse cx="145" cy="128" rx="7" ry="10" fill="#81C784" opacity="0.9" />
-                  <ellipse cx="142" cy="122" rx="6" ry="9" fill="#81C784" opacity="0.85" />
-                </g>
-                
-                {/* Top Leaves */}
-                <g className="branch branch-5">
-                  <ellipse cx="90" cy="130" rx="9" ry="14" fill="#4CAF50" opacity="0.95" transform="rotate(-35 90 130)" />
-                  <ellipse cx="110" cy="130" rx="9" ry="14" fill="#4CAF50" opacity="0.95" transform="rotate(35 110 130)" />
-                </g>
-              </svg>
+              <GrowingPlantAnimation />
             </div>
           </div>
         </div>
