@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
-import { CheckCircle, Package, Truck, MapPin, ArrowRight, Home } from 'lucide-react';
+import { CheckCircle, Package, Truck, MapPin, ArrowRight, Home, CreditCard } from 'lucide-react';
 import '../styles/OrderConfirmation.css';
 
 const API_BASE_URL = 'http://localhost:5000/api';
+
+const priceFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const formatPrice = (v) => priceFormatter.format(Number(v || 0));
+
+const PAYMENT_METHOD_LABELS = {
+  razorpay: { label: 'Razorpay (Online)', color: '#528ff5', bg: '#eef3ff' },
+  card: { label: 'Credit/Debit Card', color: '#4caf50', bg: '#e8f5e9' },
+  cod: { label: 'Cash on Delivery', color: '#f57c00', bg: '#fff3e0' },
+};
 
 function OrderConfirmation() {
   const { orderId } = useParams();
@@ -87,6 +101,17 @@ function OrderConfirmation() {
         <div className="order-number">
           Order Number: <strong>{order.orderNumber}</strong>
         </div>
+        {/* Payment Method Badge */}
+        {order.paymentMethod && (() => {
+          const pm = PAYMENT_METHOD_LABELS[order.paymentMethod] || { label: order.paymentMethod, color: '#666', bg: '#f5f5f5' };
+          return (
+            <div className="payment-badge" style={{ background: pm.bg, color: pm.color }}>
+              <CreditCard size={14} />
+              <span>{pm.label}</span>
+              {order.paymentStatus === 'paid' && <CheckCircle size={14} />}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Order Timeline */}
@@ -135,7 +160,7 @@ function OrderConfirmation() {
                   <h3>{item.name}</h3>
                   <p>Quantity: {item.quantity}</p>
                 </div>
-                <p className="confirmation-item-price">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="confirmation-item-price">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
           </div>
@@ -143,20 +168,26 @@ function OrderConfirmation() {
           <div className="order-totals">
             <div className="total-row">
               <span>Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
+              <span>{formatPrice(order.subtotal)}</span>
             </div>
             <div className="total-row">
-              <span>Tax</span>
-              <span>${order.tax.toFixed(2)}</span>
+              <span>Tax (8%)</span>
+              <span>{formatPrice(order.tax)}</span>
             </div>
             <div className="total-row">
               <span>Shipping</span>
-              <span>{order.shippingCost === 0 ? 'FREE' : `$${order.shippingCost.toFixed(2)}`}</span>
+              <span>{order.shippingCost === 0 ? 'FREE' : formatPrice(order.shippingCost)}</span>
             </div>
             <div className="total-row grand-total">
-              <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>Total Paid</span>
+              <span>{formatPrice(order.total)}</span>
             </div>
+            {order.razorpayPaymentId && (
+              <div className="total-row" style={{ fontSize: '0.8rem', color: '#888' }}>
+                <span>Payment ID</span>
+                <span style={{ fontFamily: 'monospace' }}>{order.razorpayPaymentId}</span>
+              </div>
+            )}
           </div>
         </div>
 

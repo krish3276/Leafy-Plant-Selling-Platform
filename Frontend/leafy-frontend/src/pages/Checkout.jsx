@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, Shield } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, AlertCircle, Copy } from 'lucide-react';
 import { cartAPI } from '../utils/api';
+import { initiateRazorpayPayment } from '../utils/razorpay';
 import '../styles/Checkout.css';
 
 const priceFormatter = new Intl.NumberFormat('en-IN', {
@@ -15,12 +16,20 @@ const formatPrice = (value) => priceFormatter.format(Number(value || 0));
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// ─── Test Card Details ────────────────────────────────────────────────────────
+const TEST_CARDS = [
+  { label: 'Success', number: '4111 1111 1111 1111', cvv: '123', expiry: '12/28' },
+  { label: 'International', number: '5267 3181 8797 5449', cvv: '123', expiry: '12/28' },
+];
+
 function Checkout() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [paymentStep, setPaymentStep] = useState(''); // 'creating' | 'verifying' | ''
   const [error, setError] = useState(null);
+  const [copiedCard, setCopiedCard] = useState(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -29,7 +38,7 @@ function Checkout() {
     state: '',
     zipCode: '',
     phone: '',
-    paymentMethod: 'card',
+    paymentMethod: 'razorpay',
     notes: '',
   });
 
@@ -66,7 +75,6 @@ function Checkout() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (formErrors[name]) {
       setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -87,66 +95,142 @@ function Checkout() {
     return Object.keys(errors).length === 0;
   };
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => {
+  const calculateSubtotal = () =>
+    cartItems.reduce((total, item) => {
       const price = item.productId?.price || 0;
       return total + price * item.quantity;
     }, 0);
-  };
 
   const subtotal = calculateSubtotal();
   const tax = subtotal * 0.08;
   const shipping = subtotal > 50 ? 0 : 5.99;
   const total = subtotal + tax + shipping;
 
+  // ── Handle COD Order ──────────────────────────────────────────────────────
+  const handleCODOrder = async () => {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        shippingAddress: {
+          fullName: formData.fullName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          phone: formData.phone,
+        },
+        paymentMethod: 'cod',
+        notes: formData.notes,
+      }),
+    });
+    const data = await response.json();
+    if (data.success) {
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+      navigate(`/order-confirmation/${data.order._id}`, { state: { order: data.order } });
+    } else {
+      throw new Error(data.message || 'Failed to place COD order');
+    }
+  };
+
+  // ── Handle Razorpay Payment ───────────────────────────────────────────────
+  const handleRazorpayPayment = async () => {
+    const token = localStorage.getItem('authToken');
+
+    // Step 1: Open Razorpay modal
+    setPaymentStep('creating');
+    const paymentResponse = await initiateRazorpayPayment({
+      token,
+      userInfo: {
+        name: formData.fullName,
+        email: localStorage.getItem('userEmail') || '',
+        phone: formData.phone,
+      },
+    });
+
+    // Step 2: Verify payment & create DB order
+    setPaymentStep('verifying');
+    const verifyResponse = await fetch(`${API_BASE_URL}/payment/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        shippingAddress: {
+          fullName: formData.fullName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          phone: formData.phone,
+        },
+        notes: formData.notes,
+      }),
+    });
+
+    const verifyData = await verifyResponse.json();
+    if (verifyData.success) {
+      window.dispatchEvent(new CustomEvent('cartUpdated'));
+      navigate(`/order-confirmation/${verifyData.order._id}`, {
+        state: { order: verifyData.order },
+      });
+    } else {
+      throw new Error(verifyData.message || 'Payment verification failed');
+    }
+  };
+
+  // ── Main Submit Handler ───────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setSubmitting(true);
     setError(null);
+    setPaymentStep('');
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          shippingAddress: {
-            fullName: formData.fullName,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zipCode: formData.zipCode,
-            phone: formData.phone,
-          },
-          paymentMethod: formData.paymentMethod,
-          notes: formData.notes,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Dispatch cart update event
-        window.dispatchEvent(new CustomEvent('cartUpdated'));
-        // Navigate to order confirmation
-        navigate(`/order-confirmation/${data.order._id}`, {
-          state: { order: data.order },
-        });
+      if (formData.paymentMethod === 'cod') {
+        await handleCODOrder();
       } else {
-        setError(data.message || 'Failed to place order');
+        await handleRazorpayPayment();
       }
     } catch (err) {
       console.error('Checkout error:', err);
-      setError('Failed to place order. Please try again.');
+      const msg = err.message || '';
+      if (msg.includes('cancelled')) {
+        setError('Payment was cancelled. You can try again.');
+      } else {
+        setError(msg || 'Payment failed. Please try again.');
+      }
     } finally {
       setSubmitting(false);
+      setPaymentStep('');
     }
+  };
+
+  const copyToClipboard = (text, cardIndex) => {
+    navigator.clipboard.writeText(text.replace(/\s/g, ''));
+    setCopiedCard(cardIndex);
+    setTimeout(() => setCopiedCard(null), 2000);
+  };
+
+  const getButtonLabel = () => {
+    if (!submitting) {
+      return formData.paymentMethod === 'cod'
+        ? `Place Order — ${formatPrice(total)}`
+        : `Pay ${formatPrice(total)} via Razorpay`;
+    }
+    if (paymentStep === 'creating') return 'Opening Payment Gateway...';
+    if (paymentStep === 'verifying') return 'Verifying Payment...';
+    return 'Processing...';
   };
 
   if (loading) {
@@ -169,11 +253,17 @@ function Checkout() {
 
       <h1 className="checkout-title">Checkout</h1>
 
-      {error && <div className="checkout-error">{error}</div>}
+      {error && (
+        <div className="checkout-error">
+          <AlertCircle size={18} />
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="checkout-content">
-        {/* Checkout Form */}
+        {/* ── Checkout Form ─────────────────────────────────────────────── */}
         <form className="checkout-form" onSubmit={handleSubmit}>
+
           {/* Shipping Information */}
           <div className="form-section">
             <h2>
@@ -189,12 +279,10 @@ function Checkout() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Krish Sirsath"
                 className={formErrors.fullName ? 'error' : ''}
               />
-              {formErrors.fullName && (
-                <span className="error-text">{formErrors.fullName}</span>
-              )}
+              {formErrors.fullName && <span className="error-text">{formErrors.fullName}</span>}
             </div>
 
             <div className="form-group">
@@ -208,9 +296,7 @@ function Checkout() {
                 placeholder="123 Green Street"
                 className={formErrors.address ? 'error' : ''}
               />
-              {formErrors.address && (
-                <span className="error-text">{formErrors.address}</span>
-              )}
+              {formErrors.address && <span className="error-text">{formErrors.address}</span>}
             </div>
 
             <div className="form-row">
@@ -222,12 +308,10 @@ function Checkout() {
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="New York"
+                  placeholder="Mumbai"
                   className={formErrors.city ? 'error' : ''}
                 />
-                {formErrors.city && (
-                  <span className="error-text">{formErrors.city}</span>
-                )}
+                {formErrors.city && <span className="error-text">{formErrors.city}</span>}
               </div>
 
               <div className="form-group">
@@ -238,28 +322,24 @@ function Checkout() {
                   name="state"
                   value={formData.state}
                   onChange={handleChange}
-                  placeholder="NY"
+                  placeholder="Maharashtra"
                   className={formErrors.state ? 'error' : ''}
                 />
-                {formErrors.state && (
-                  <span className="error-text">{formErrors.state}</span>
-                )}
+                {formErrors.state && <span className="error-text">{formErrors.state}</span>}
               </div>
 
               <div className="form-group">
-                <label htmlFor="zipCode">ZIP Code *</label>
+                <label htmlFor="zipCode">PIN Code *</label>
                 <input
                   type="text"
                   id="zipCode"
                   name="zipCode"
                   value={formData.zipCode}
                   onChange={handleChange}
-                  placeholder="10001"
+                  placeholder="400001"
                   className={formErrors.zipCode ? 'error' : ''}
                 />
-                {formErrors.zipCode && (
-                  <span className="error-text">{formErrors.zipCode}</span>
-                )}
+                {formErrors.zipCode && <span className="error-text">{formErrors.zipCode}</span>}
               </div>
             </div>
 
@@ -271,12 +351,10 @@ function Checkout() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="(555) 123-4567"
+                placeholder="9876543210"
                 className={formErrors.phone ? 'error' : ''}
               />
-              {formErrors.phone && (
-                <span className="error-text">{formErrors.phone}</span>
-              )}
+              {formErrors.phone && <span className="error-text">{formErrors.phone}</span>}
             </div>
           </div>
 
@@ -288,19 +366,34 @@ function Checkout() {
             </h2>
 
             <div className="payment-options">
-              <label className={`payment-option ${formData.paymentMethod === 'card' ? 'selected' : ''}`}>
+              {/* Razorpay Option */}
+              <label
+                className={`payment-option razorpay-option ${
+                  formData.paymentMethod === 'razorpay' ? 'selected' : ''
+                }`}
+                id="payment-razorpay"
+              >
                 <input
                   type="radio"
                   name="paymentMethod"
-                  value="card"
-                  checked={formData.paymentMethod === 'card'}
+                  value="razorpay"
+                  checked={formData.paymentMethod === 'razorpay'}
                   onChange={handleChange}
                 />
-                <CreditCard size={20} />
-                <span>Credit/Debit Card</span>
+                <div className="razorpay-badge">
+                  <span className="rzp-logo">Rzp</span>
+                  <span>Pay via Razorpay</span>
+                </div>
+                {formData.paymentMethod === 'razorpay' && (
+                  <CheckCircle size={18} className="check-icon" />
+                )}
               </label>
 
-              <label className={`payment-option ${formData.paymentMethod === 'cod' ? 'selected' : ''}`}>
+              {/* COD Option */}
+              <label
+                className={`payment-option ${formData.paymentMethod === 'cod' ? 'selected' : ''}`}
+                id="payment-cod"
+              >
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -310,13 +403,49 @@ function Checkout() {
                 />
                 <Truck size={20} />
                 <span>Cash on Delivery</span>
+                {formData.paymentMethod === 'cod' && (
+                  <CheckCircle size={18} className="check-icon" />
+                )}
               </label>
             </div>
 
-            {formData.paymentMethod === 'card' && (
+            {/* Test Mode Info Box */}
+            {formData.paymentMethod === 'razorpay' && (
+              <div className="test-card-info">
+                <div className="test-card-header">
+                  <Shield size={16} />
+                  <span>Test Mode — Use the cards below to simulate payment</span>
+                </div>
+                <div className="test-cards-grid">
+                  {TEST_CARDS.map((card, idx) => (
+                    <div key={idx} className="test-card-item">
+                      <div className="test-card-label">{card.label}</div>
+                      <div className="test-card-number">
+                        <code>{card.number}</code>
+                        <button
+                          type="button"
+                          className="copy-btn"
+                          onClick={() => copyToClipboard(card.number, idx)}
+                          title="Copy card number"
+                        >
+                          {copiedCard === idx ? <CheckCircle size={14} /> : <Copy size={14} />}
+                        </button>
+                      </div>
+                      <div className="test-card-meta">
+                        <span>CVV: <strong>{card.cvv}</strong></span>
+                        <span>Expiry: <strong>{card.expiry}</strong></span>
+                        <span>OTP: <strong>1234</strong></span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {formData.paymentMethod === 'cod' && (
               <div className="card-note">
-                <Shield size={16} />
-                <span>For demo purposes, no actual payment will be processed.</span>
+                <Truck size={16} />
+                <span>Pay with cash when your plants are delivered at your doorstep.</span>
               </div>
             )}
           </div>
@@ -334,7 +463,7 @@ function Checkout() {
           </div>
         </form>
 
-        {/* Order Summary */}
+        {/* ── Order Summary ──────────────────────────────────────────────── */}
         <div className="order-summary">
           <h2>Order Summary</h2>
 
@@ -349,9 +478,7 @@ function Checkout() {
                     <p className="item-name">{product.name}</p>
                     <p className="item-qty">Qty: {item.quantity}</p>
                   </div>
-                  <p className="item-price">
-                    {formatPrice(product.price * item.quantity)}
-                  </p>
+                  <p className="item-price">{formatPrice(product.price * item.quantity)}</p>
                 </div>
               );
             })}
@@ -381,17 +508,31 @@ function Checkout() {
 
           <button
             type="submit"
-            className="place-order-btn"
+            id="place-order-btn"
+            className={`place-order-btn ${
+              formData.paymentMethod === 'razorpay' ? 'razorpay-btn' : 'cod-btn'
+            }`}
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? 'Placing Order...' : `Place Order - ${formatPrice(total)}`}
+            {submitting && <span className="btn-spinner"></span>}
+            {getButtonLabel()}
           </button>
 
-          <div className="secure-checkout">
-            <Shield size={16} />
-            <span>Secure Checkout</span>
-          </div>
+          {formData.paymentMethod === 'razorpay' && (
+            <div className="razorpay-powered">
+              <Shield size={14} />
+              <span>Secured by</span>
+              <span className="rzp-powered-logo">Razorpay</span>
+            </div>
+          )}
+
+          {formData.paymentMethod === 'cod' && (
+            <div className="secure-checkout">
+              <Shield size={16} />
+              <span>Safe & Secure Checkout</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

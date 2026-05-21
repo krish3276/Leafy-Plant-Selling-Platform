@@ -74,8 +74,19 @@ const orderSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ['card', 'cod'],
+      enum: ['card', 'cod', 'razorpay'],
       default: 'card',
+    },
+
+    // Razorpay transaction references (populated after successful payment)
+    razorpayOrderId: {
+      type: String,
+      default: null,
+    },
+
+    razorpayPaymentId: {
+      type: String,
+      default: null,
     },
 
     paymentStatus: {
