@@ -1,10 +1,17 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
+import { oauthConfig } from '../config/oauthConfig';
 import '../styles/Auth.css';
 
 function Login() {
+  const googleClientId = oauthConfig.google.clientId;
+
   useEffect(() => {
+    if (!googleClientId) {
+      return undefined;
+    }
+
     // Load Google SDK
     const script = document.createElement('script');
     script.async = true;
@@ -37,7 +44,7 @@ function Login() {
         document.head.removeChild(script);
       }
     };
-  }, []);
+  }, [googleClientId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,7 +163,13 @@ function Login() {
 
           <div className="oauth-buttons">
             <div className="google-auth-button-wrap">
-              <div id="google-signin-button"></div>
+              {googleClientId ? (
+                <div id="google-signin-button"></div>
+              ) : (
+                <p className="oauth-disabled-message">
+                  Google sign-in is not configured on this development server.
+                </p>
+              )}
             </div>
           </div>
 

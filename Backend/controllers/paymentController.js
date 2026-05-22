@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import razorpay from '../config/razorpay.js';
+import { getRazorpayInstance, isRazorpayConfigured } from '../config/razorpay.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
@@ -9,6 +9,13 @@ import { createNotification } from './notificationController.js';
 // ─── GET KEY ────────────────────────────────────────────────────────────────
 // Returns the Razorpay key_id to the frontend so it never has to be hardcoded
 export const getRazorpayKey = (req, res) => {
+  if (!isRazorpayConfigured()) {
+    return res.status(503).json({
+      success: false,
+      message: 'Razorpay is not configured on the server',
+    });
+  }
+
   res.status(200).json({
     success: true,
     keyId: process.env.RAZORPAY_KEY_ID,
@@ -20,6 +27,15 @@ export const getRazorpayKey = (req, res) => {
 // The actual DB Order is NOT saved yet — that happens after payment verification.
 export const createRazorpayOrder = async (req, res) => {
   try {
+    const razorpay = getRazorpayInstance();
+
+    if (!razorpay) {
+      return res.status(503).json({
+        success: false,
+        message: 'Razorpay is not configured on the server',
+      });
+    }
+
     const user = await User.findById(req.user.id).populate('cart.productId');
 
     if (!user) {
@@ -87,6 +103,13 @@ export const createRazorpayOrder = async (req, res) => {
 // signature, then create the DB Order exactly as the existing createOrder does.
 export const verifyAndCreateOrder = async (req, res) => {
   try {
+    if (!isRazorpayConfigured()) {
+      return res.status(503).json({
+        success: false,
+        message: 'Razorpay is not configured on the server',
+      });
+    }
+
     const {
       razorpay_order_id,
       razorpay_payment_id,

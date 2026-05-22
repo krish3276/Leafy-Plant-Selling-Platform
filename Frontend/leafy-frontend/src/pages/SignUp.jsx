@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { oauthConfig } from '../config/oauthConfig';
 import '../styles/Auth.css';
 
 function SignUp() {
@@ -8,6 +9,7 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const googleClientId = oauthConfig.google.clientId;
 
   const handleGoogleSignUp = async (response) => {
     const token = response?.credential;
@@ -45,6 +47,10 @@ function SignUp() {
   };
 
   useEffect(() => {
+    if (!googleClientId) {
+      return undefined;
+    }
+
     const script = document.createElement('script');
     script.async = true;
     script.defer = true;
@@ -76,7 +82,7 @@ function SignUp() {
         document.head.removeChild(script);
       }
     };
-  }, []);
+  }, [googleClientId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,7 +171,13 @@ function SignUp() {
 
           <div className="oauth-buttons">
             <div className="google-auth-button-wrap">
-              <div id="google-signup-button"></div>
+              {googleClientId ? (
+                <div id="google-signup-button"></div>
+              ) : (
+                <p className="oauth-disabled-message">
+                  Google sign-up is not configured on this development server.
+                </p>
+              )}
             </div>
           </div>
 

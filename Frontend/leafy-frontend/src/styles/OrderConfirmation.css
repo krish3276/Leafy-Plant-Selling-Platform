@@ -306,10 +306,13 @@
 
 /* Action Buttons */
 .confirmation-actions {
-  display: flex;
+  /* background: red; */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
   justify-content: center;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .view-orders-btn {
@@ -318,10 +321,18 @@
   gap: 0.5rem;
   background: #4caf50;
   color: white;
-  padding: 0.875rem 1.5rem;
+  height: 48px;
+  padding: 0 1.5rem;
+  line-height: 1;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
+  justify-content: center;
+  min-width: 220px;
+  box-sizing: border-box;
+  min-height: 48px;
+  vertical-align: middle;
+  border: 2px solid transparent;
   transition: all 0.3s;
 }
 
@@ -336,12 +347,21 @@
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.95);
   color: #4caf50;
-  padding: 0.875rem 1.5rem;
+  /* height: 48px; */
+  padding: 0 1.5rem;
+  line-height: 1;
   border-radius: 8px;
   border: 2px solid #4caf50;
   text-decoration: none;
   font-weight: 600;
+  justify-content: center;
+  min-width: 220px;
+  box-sizing: border-box;
+  min-height: 48px;
+  vertical-align: middle;
+  /* min-height: 48px; */
   transition: all 0.3s;
+  margin-top: 0rem;
 }
 
 .continue-shopping-btn:hover {

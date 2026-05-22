@@ -100,7 +100,7 @@ function OrderConfirmation() {
         <p>Thank you for your order. Your plants are on their way! 🌱</p>
         <div className="order-number">
           Order Number: <strong>{order.orderNumber}</strong>
-        </div>
+        </div> <br />
         {/* Payment Method Badge */}
         {order.paymentMethod && (() => {
           const pm = PAYMENT_METHOD_LABELS[order.paymentMethod] || { label: order.paymentMethod, color: '#666', bg: '#f5f5f5' };
