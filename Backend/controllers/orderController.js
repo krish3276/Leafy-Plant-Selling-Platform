@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Product from '../models/Product.js';
 import { syncGardenPlantsFromOrder } from './gardenController.js';
 import { createNotification } from './notificationController.js';
+import { getRazorpayInstance } from '../config/razorpay.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -347,11 +348,58 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    if (!['pending', 'confirmed'].includes(order.orderStatus)) {
+    // Allow cancellation for orders that haven't been delivered yet
+    const cancellableStatuses = ['pending', 'confirmed', 'processing', 'shipped'];
+    if (!cancellableStatuses.includes(order.orderStatus)) {
       return res.status(400).json({
         success: false,
-        message: 'Order cannot be cancelled at this stage',
+        message: `Order cannot be cancelled. Current status: ${order.orderStatus}. Orders can only be cancelled before delivery.`,
       });
+    }
+
+    // Handle Razorpay refund if payment was made via Razorpay
+    let refundDetails = null;
+    if (
+      order.paymentMethod === 'razorpay' &&
+      order.paymentStatus === 'paid' &&
+      order.razorpayPaymentId
+    ) {
+      try {
+        const razorpay = getRazorpayInstance();
+        if (razorpay) {
+          const refund = await razorpay.payments.refund(order.razorpayPaymentId, {
+            amount: Math.round(order.total * 100), // Convert to paise
+            notes: {
+              reason: 'Order cancelled by customer',
+              orderId: order._id.toString(),
+              orderNumber: order.orderNumber,
+            },
+          });
+
+          if (refund && refund.id) {
+            order.razorpayRefundId = refund.id;
+            order.paymentStatus = 'refunded';
+            order.refundedAt = new Date();
+            refundDetails = {
+              refundId: refund.id,
+              amount: order.total,
+              status: refund.status,
+            };
+          }
+        }
+      } catch (refundError) {
+        console.error('Razorpay Refund Error:', refundError);
+        // Log the error but don't fail the cancellation
+        // The refund can be retried later
+        return res.status(400).json({
+          success: false,
+          message: 'Failed to process refund. Please contact support.',
+          error: refundError.message,
+        });
+      }
+    } else if (order.paymentMethod === 'cod') {
+      // COD orders don't need refund processing
+      order.paymentStatus = 'pending';
     }
 
     // Restore product stock
@@ -365,16 +413,73 @@ export const cancelOrder = async (req, res) => {
     order.cancelledAt = new Date();
     await order.save();
 
+    // Create notification for user about cancellation
+    try {
+      const user = await User.findById(order.user).select('_id firstName lastName');
+      const notificationPayload = {
+        type: 'order_cancelled',
+        title: `Order Cancelled: ${order.orderNumber}`,
+        message: refundDetails
+          ? `Your order has been cancelled. A refund of ₹${order.total.toFixed(2)} will be processed to your Razorpay account within 5-7 business days.`
+          : `Your order has been cancelled.`,
+        relatedId: order._id,
+        relatedType: 'order',
+        data: {
+          orderId: order._id,
+          orderNumber: order.orderNumber,
+          refund: refundDetails,
+        },
+        priority: 'high',
+      };
+
+      await createNotification(order.user, notificationPayload);
+
+      // Also notify admins
+      const admins = await User.find({ role: 'admin' }).select('_id firstName lastName email');
+      const adminNotificationPayload = {
+        type: 'order_cancelled',
+        title: `Order Cancelled: ${order.orderNumber}`,
+        message: `Order ${order.orderNumber} by ${user.firstName} ${user.lastName} has been cancelled.`,
+        relatedId: order._id,
+        relatedType: 'order',
+        data: {
+          orderId: order._id,
+          orderNumber: order.orderNumber,
+          cancelledBy: 'customer',
+        },
+        priority: 'medium',
+      };
+
+      for (const admin of admins) {
+        createNotification(admin._id, adminNotificationPayload).catch((err) =>
+          console.error('Failed to create admin notification:', err)
+        );
+      }
+    } catch (notifyErr) {
+      console.error('Error creating notifications:', notifyErr);
+      // Don't fail the cancellation if notification fails
+    }
+
     res.status(200).json({
       success: true,
-      message: 'Order cancelled successfully',
-      order,
+      message: refundDetails
+        ? 'Order cancelled successfully. Refund has been initiated and will appear in your account within 5-7 business days.'
+        : 'Order cancelled successfully',
+      order: {
+        _id: order._id,
+        orderNumber: order.orderNumber,
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        cancelledAt: order.cancelledAt,
+        refund: refundDetails,
+        total: order.total,
+      },
     });
   } catch (error) {
     console.error('Cancel Order Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: 'Server error while cancelling order',
       error: error.message,
     });
   }

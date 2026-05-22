@@ -89,6 +89,11 @@ const orderSchema = new mongoose.Schema(
       default: null,
     },
 
+    razorpayRefundId: {
+      type: String,
+      default: null,
+    },
+
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed', 'refunded'],
@@ -128,6 +133,7 @@ const orderSchema = new mongoose.Schema(
 
     deliveredAt: Date,
     cancelledAt: Date,
+    refundedAt: Date,
   },
   {
     timestamps: true,

@@ -41,6 +41,11 @@ function Account() {
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [trackingError, setTrackingError] = useState('');
   const [trackingData, setTrackingData] = useState(null);
+  const [cancelOrderId, setCancelOrderId] = useState(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelError, setCancelError] = useState('');
+  const [cancelResult, setCancelResult] = useState(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
@@ -263,6 +268,55 @@ function Account() {
     setTrackingLoading(false);
     setTrackingError('');
     setTrackingData(null);
+  };
+
+  const openCancelModal = (order) => {
+    setCancelOrderId(order._id);
+    setCancelError('');
+    setCancelResult(null);
+    setShowCancelConfirm(true);
+  };
+
+  const closeCancelModal = () => {
+    setCancelOrderId(null);
+    setCancelLoading(false);
+    setCancelError('');
+    setCancelResult(null);
+    setShowCancelConfirm(false);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderId) return;
+
+    try {
+      setCancelLoading(true);
+      setCancelError('');
+      setCancelResult(null);
+      setShowCancelConfirm(false);
+
+      const response = await orderAPI.cancelOrder(cancelOrderId);
+
+      if (response.success) {
+        setCancelResult(response);
+        // Update the orders list
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Brief delay for UX
+        
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === cancelOrderId
+              ? { ...order, orderStatus: 'cancelled', paymentStatus: response.order?.paymentStatus }
+              : order
+          )
+        );
+      } else {
+        setCancelError(response.message || 'Failed to cancel order');
+      }
+    } catch (error) {
+      console.error('Cancel order error:', error);
+      setCancelError(error.message || 'Failed to cancel order. Please try again.');
+    } finally {
+      setCancelLoading(false);
+    }
   };
 
   const formatTrackingDate = (dateString) => {
@@ -579,9 +633,16 @@ function Account() {
                               <span>Total</span>
                               <h4>{formatPrice(order.total)}</h4>
                             </div>
-                            <button className="btn-track" onClick={() => openTrackingModal(order)}>
-                              {getTrackingLabel(order.orderStatus)}
-                            </button>
+                            <div className="order-buttons">
+                              <button className="btn-track" onClick={() => openTrackingModal(order)}>
+                                {getTrackingLabel(order.orderStatus)}
+                              </button>
+                              {!['delivered', 'cancelled'].includes(order.orderStatus) && (
+                                <button className="btn-cancel" onClick={() => openCancelModal(order)}>
+                                  Cancel Order
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1096,6 +1157,119 @@ function Account() {
                       </div>
                     </>
                   ) : null}
+                </div>
+              </div>
+            )}
+
+            {/* Cancel Confirmation Modal */}
+            {showCancelConfirm && cancelOrderId && (
+              <div className="cancel-modal-overlay" onClick={closeCancelModal} role="presentation">
+                <div className="cancel-modal" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
+                  <div className="cancel-modal-header">
+                    <h3>Cancel Order?</h3>
+                    <button type="button" className="cancel-close-btn" onClick={closeCancelModal} aria-label="Close cancel modal">
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="cancel-modal-body">
+                    <p className="cancel-modal-message">
+                      Are you sure you want to cancel this order? Once cancelled:
+                    </p>
+                    <ul className="cancel-modal-list">
+                      <li>Your payment will be refunded to your original payment method</li>
+                      <li>Refund may take 5-7 business days to appear in your account</li>
+                      <li>Product stock will be restored for other customers</li>
+                      <li>This action cannot be undone once confirmed</li>
+                    </ul>
+                    {cancelError && (
+                      <div className="cancel-modal-error">
+                        <p>{cancelError}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="cancel-modal-footer">
+                    <button 
+                      className="btn-secondary" 
+                      onClick={closeCancelModal}
+                      disabled={cancelLoading}
+                    >
+                      Keep Order
+                    </button>
+                    <button 
+                      className="btn-cancel-confirm" 
+                      onClick={handleCancelOrder}
+                      disabled={cancelLoading}
+                    >
+                      {cancelLoading ? 'Cancelling...' : 'Confirm Cancellation'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cancel Success Modal */}
+            {cancelResult && (
+              <div className="cancel-modal-overlay" onClick={closeCancelModal} role="presentation">
+                <div className="cancel-modal cancel-success-modal" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
+                  <div className="cancel-modal-header">
+                    <h3>Order Cancelled Successfully ✓</h3>
+                    <button type="button" className="cancel-close-btn" onClick={closeCancelModal} aria-label="Close success modal">
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="cancel-modal-body">
+                    <div className="success-icon">✓</div>
+                    <p className="success-message">{cancelResult.message}</p>
+                    
+                    {cancelResult.order?.refund && (
+                      <div className="refund-details-box">
+                        <h4>Refund Details</h4>
+                        <div className="refund-detail-row">
+                          <span>Refund Amount:</span>
+                          <strong>{formatPrice(cancelResult.order.refund.amount)}</strong>
+                        </div>
+                        <div className="refund-detail-row">
+                          <span>Refund ID:</span>
+                          <strong className="refund-id">{cancelResult.order.refund.refundId}</strong>
+                        </div>
+                        <div className="refund-detail-row">
+                          <span>Status:</span>
+                          <strong className="refund-status">{cancelResult.order.refund.status}</strong>
+                        </div>
+                        <p className="refund-timeline">
+                          The refund will be processed to your original payment method within 5-7 business days.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="order-details-compact">
+                      <h4>Order Details</h4>
+                      <div className="order-detail-row">
+                        <span>Order Number:</span>
+                        <strong>{cancelResult.order?.orderNumber}</strong>
+                      </div>
+                      <div className="order-detail-row">
+                        <span>Total Amount:</span>
+                        <strong>{formatPrice(cancelResult.order?.total)}</strong>
+                      </div>
+                      <div className="order-detail-row">
+                        <span>Cancelled On:</span>
+                        <strong>{formatTrackingDate(cancelResult.order?.cancelledAt)}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="cancel-modal-footer">
+                    <button 
+                      className="btn-primary" 
+                      onClick={closeCancelModal}
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
