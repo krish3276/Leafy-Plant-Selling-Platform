@@ -176,7 +176,8 @@ function PlantCare() {
   }, [messages]);
 
   useEffect(() => {
-    inputRef.current?.focus();
+    window.scrollTo(0, 0);
+    inputRef.current?.focus({ preventScroll: true });
   }, []);
 
   useEffect(() => {

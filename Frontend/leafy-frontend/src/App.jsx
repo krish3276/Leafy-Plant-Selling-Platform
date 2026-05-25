@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import React, { useLayoutEffect } from 'react';
+import { Routes, Route, Outlet, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -27,33 +27,65 @@ function CustomerLayout() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+
+    const timeoutId = window.setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 0);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
-    <Routes>
-      {/* Admin Routes - No Navbar/Footer */}
-      <Route path="admin/dashboard" element={<AdminDashboard />} />
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Admin Routes - No Navbar/Footer */}
+        <Route path="admin/dashboard" element={<AdminDashboard />} />
 
-      {/* Customer Routes - With Navbar/Footer */}
-      <Route path="/" element={<CustomerLayout />}>
-        <Route index element={<Home />} />
-        <Route path="shop" element={<Shop />} />
-        <Route path="shop/:category" element={<Shop />} />
-        <Route path="product/:id" element={<ProductDetail />} />
-        <Route path="plant-care" element={<PlantCare />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="faqs" element={<FAQs />} />
-        <Route path="cart" element={<Cart />} />
-        <Route path="checkout" element={<Checkout />} />
-        <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />
-        <Route path="account" element={<Account />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<SignUp />} />
-      </Route>
+        {/* Customer Routes - With Navbar/Footer */}
+        <Route path="/" element={<CustomerLayout />}>
+          <Route index element={<Home />} />
+          <Route path="shop" element={<Shop />} />
+          <Route path="shop/:category" element={<Shop />} />
+          <Route path="product/:id" element={<ProductDetail />} />
+          <Route path="plant-care" element={<PlantCare />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="faqs" element={<FAQs />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />
+          <Route path="account" element={<Account />} />
+          <Route path="login" element={<Login />} />
+          <Route path="signup" element={<SignUp />} />
+        </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 
