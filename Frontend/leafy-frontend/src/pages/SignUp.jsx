@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { oauthConfig } from '../config/oauthConfig';
+
 import '../styles/Auth.css';
 
 function SignUp() {
@@ -9,7 +9,7 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const googleClientId = oauthConfig.google.clientId;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   const handleGoogleSignUp = async (response) => {
     const token = response?.credential;

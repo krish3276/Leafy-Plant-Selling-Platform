@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
-import { oauthConfig } from '../config/oauthConfig';
+
 import '../styles/Auth.css';
 
 function Login() {
-  const googleClientId = oauthConfig.google.clientId;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   useEffect(() => {
     if (!googleClientId) {
