@@ -20,8 +20,8 @@
   position: absolute;
   top: -50%;
   right: -10%;
-  width: 500px;
-  height: 500px;
+  width: min(100%, 500px);
+  aspect-ratio: 1 / 1;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
@@ -78,9 +78,102 @@
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 3rem;
   align-items: center;
+}
+@media (max-width: 1024px) {
+  .story-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .story-content {
+    max-width: 100%;
+  }
+
+  .story-image-placeholder {
+    width: 100%;
+    min-height: 320px;
+  }
+
+  .growing-plant-animation {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 4rem 1.25rem;
+  }
+
+  .about-hero-title {
+    font-size: 2.5rem;
+  }
+
+  .about-hero-subtitle {
+    font-size: 1.05rem;
+  }
+
+  .company-story,
+  .why-choose {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .section-title,
+  .story-content h2 {
+    font-size: 1.9rem;
+  }
+
+  .story-paragraph {
+    text-align: left;
+    font-size: 1rem;
+  }
+
+  .story-image-placeholder {
+    min-height: 280px;
+    border-radius: 22px;
+  }
+
+  .growth-scene {
+    min-height: 240px;
+  }
+
+  .soil-bed {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero {
+    padding: 3rem 1rem;
+  }
+
+  .about-hero-title {
+    font-size: 2rem;
+  }
+
+  .about-hero-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .company-story,
+  .why-choose {
+    padding-inline: 1rem;
+  }
+
+  .story-image-placeholder {
+    min-height: 240px;
+    padding: 0.75rem;
+  }
+
+  .growth-scene {
+    min-height: 210px;
+  }
+
+  .soil-bed {
+    height: 200px;
+  }
 }
 
 .story-content h2{

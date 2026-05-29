@@ -20,8 +20,8 @@
   position: absolute;
   top: -30%;
   right: -5%;
-  width: 400px;
-  height: 400px;
+    width: min(100%, 400px);
+    aspect-ratio: 1 / 1;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
@@ -31,8 +31,8 @@
   position: absolute;
   bottom: -20%;
   left: -5%;
-  width: 300px;
-  height: 300px;
+    width: min(100%, 300px);
+    aspect-ratio: 1 / 1;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 50%;
 }
@@ -462,7 +462,7 @@
 }
 
 .map-placeholder {
-  height: 400px;
+  min-height: clamp(280px, 45vw, 400px);
   background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
   display: flex;
   flex-direction: column;
@@ -488,7 +488,7 @@
   margin-top: 1.5rem;
   border-radius: 12px;
   overflow: hidden;
-  height: 320px;
+  min-height: clamp(240px, 35vw, 320px);
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
   border: 1px solid #e9efe8;
 }

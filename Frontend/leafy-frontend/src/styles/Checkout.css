@@ -79,7 +79,7 @@
 /* ── Layout ──────────────────────────────────────────────────────────────── */
 .checkout-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
   gap: 2rem;
   align-items: start;
 }
@@ -375,6 +375,7 @@
   border: 1px solid #f0f4f0;
   position: sticky;
   top: 2rem;
+  min-width: 0;
 }
 
 .order-summary h2 {
@@ -575,6 +576,11 @@
 
   .test-cards-grid {
     grid-template-columns: 1fr;
+  }
+
+  .place-order-btn,
+  .payment-option {
+    width: 100%;
   }
 
   .test-card-item:nth-child(even) {

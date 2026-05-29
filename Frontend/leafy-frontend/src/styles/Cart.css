@@ -313,6 +313,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 2rem;
+  min-width: 0;
 }
 
 .cart-summary h2 {
@@ -452,6 +453,13 @@
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
+  }
+
+  .continue-shopping-link,
+  .clear-cart-btn,
+  .checkout-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .cart-item-name,

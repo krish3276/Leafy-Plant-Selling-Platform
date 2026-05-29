@@ -503,7 +503,6 @@ function PlantCare() {
                         src={msg.imageUrl} 
                         alt="plant" 
                         className="chat-image-thumbnail"
-                        style={{ maxWidth: '200px', borderRadius: '8px', marginBottom: '12px' }}
                       />
                       {msg.content && <p className="bubble-text">{renderContent(msg.content)}</p>}
                     </div>

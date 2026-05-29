@@ -9,6 +9,14 @@ const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 function Login() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+  const getGoogleButtonWidth = () => {
+    if (typeof window === 'undefined') {
+      return 300;
+    }
+
+    return Math.max(240, Math.min(300, window.innerWidth - 64));
+  };
+
   useEffect(() => {
     if (!googleClientId) {
       return undefined;
@@ -35,7 +43,7 @@ function Login() {
           window.google.accounts.id.renderButton(buttonContainer, {
             theme: 'outline',
             size: 'large',
-            width: 300,
+            width: getGoogleButtonWidth(),
           });
         }
       }

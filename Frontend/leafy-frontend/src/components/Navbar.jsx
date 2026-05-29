@@ -121,13 +121,7 @@ function Navbar() {
 
         {/* Icons */}
         <div className="navbar-icons">
-          <button 
-            className="search-toggle-mobile" 
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            aria-label="Toggle search"
-          >
-            <Search size={22} />
-          </button>
+         
           <Link to="/cart" className="icon-link cart-icon-wrapper">
             <ShoppingCart size={22} />
             {cartCount > 0 && (

@@ -13,6 +13,14 @@ function SignUp() {
   const [error, setError] = useState('');
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+  const getGoogleButtonWidth = () => {
+    if (typeof window === 'undefined') {
+      return 300;
+    }
+
+    return Math.max(240, Math.min(300, window.innerWidth - 64));
+  };
+
   const handleGoogleSignUp = async (response) => {
     const token = response?.credential;
     if (!token) {
@@ -74,7 +82,7 @@ function SignUp() {
           theme: 'outline',
           size: 'large',
           text: 'signup_with',
-          width: 300,
+          width: getGoogleButtonWidth(),
         });
       }
     };

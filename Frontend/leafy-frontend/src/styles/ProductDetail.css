@@ -136,6 +136,7 @@
 .product-image-section {
   position: sticky;
   top: 2rem;
+  min-width: 0;
 }
 
 .main-image {
@@ -149,6 +150,8 @@
   width: 100%;
   height: auto;
   display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
 }
 
 .out-of-stock-overlay {
@@ -512,6 +515,12 @@
 
   .breadcrumb {
     display: none;
+  }
+
+  .add-to-cart-btn,
+  .wishlist-btn,
+  .quantity-selector {
+    width: 100%;
   }
 }
 

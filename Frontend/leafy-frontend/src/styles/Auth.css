@@ -14,6 +14,7 @@
   padding: 3rem;
   width: 100%;
   max-width: 450px;
+  min-width: 0;
 }
 
 .auth-header {
@@ -219,12 +220,25 @@
   align-items: center;
   width: 100%;
   grid-column: 1 / -1;
+  overflow: hidden;
 }
 
 .google-auth-button-wrap > div {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.google-auth-button-wrap > div > div {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.oauth-disabled-message {
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .google-auth-button-wrap iframe {
@@ -341,5 +355,9 @@
   .input-wrapper input {
     padding: 0.8rem 0.9rem 0.8rem 2.4rem;
     font-size: 0.9rem;
+  }
+
+  .oauth-buttons {
+    gap: 0.75rem;
   }
 }
