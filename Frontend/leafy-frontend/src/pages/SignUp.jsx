@@ -4,6 +4,8 @@ import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 import '../styles/Auth.css';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -22,7 +24,7 @@ function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/google', {
+      const res = await fetch(`${API_BASE_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
@@ -122,7 +124,7 @@ function SignUp() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

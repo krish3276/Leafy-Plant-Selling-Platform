@@ -19,6 +19,8 @@ import AdminSettings from '../components/Admin/AdminSettings';
 import AdminNotifications from '../components/Admin/AdminNotifications';
 import AdminContactMessages from '../components/Admin/AdminContactMessages';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function AdminDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ function AdminDashboard() {
   const fetchDashboardData = async (token) => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+      const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

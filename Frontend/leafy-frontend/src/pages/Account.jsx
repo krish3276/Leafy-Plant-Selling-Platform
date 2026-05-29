@@ -4,6 +4,8 @@ import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, LogOut, ShoppingBa
 import { authAPI, orderAPI, gardenAPI } from '../utils/api';
 import '../styles/Account.css';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 const priceFormatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
@@ -155,7 +157,7 @@ function Account() {
     try {
       const authToken = localStorage.getItem('authToken');
       
-      const response = await fetch('http://localhost:5000/api/auth/profile', {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

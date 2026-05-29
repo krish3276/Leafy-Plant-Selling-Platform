@@ -4,6 +4,8 @@ import { Mail, Lock } from 'lucide-react';
 
 import '../styles/Auth.css';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function Login() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -53,7 +55,7 @@ function Login() {
     const password = formData.get('password');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -86,7 +88,7 @@ function Login() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/google', {
+      const res = await fetch(`${API_BASE_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),

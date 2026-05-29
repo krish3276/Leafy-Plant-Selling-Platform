@@ -3,6 +3,8 @@ import { Plus, Edit2, Trash2, Search, AlertCircle } from 'lucide-react';
 import './ProductManagement.css';
 import ProductForm from './ProductForm';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 const priceFormatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
@@ -66,7 +68,7 @@ function ProductManagement({ initialProductId = '' }) {
       setLoading(true);
       setError('');
       const response = await fetch(
-        `http://localhost:5000/api/admin/products?page=${1}&limit=10&search=${searchTerm}`,
+        `${API_BASE_URL}/admin/products?page=${1}&limit=10&search=${searchTerm}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -114,7 +116,7 @@ function ProductManagement({ initialProductId = '' }) {
 
       while (pageNum <= totalPagesAvailable) {
         const response = await fetch(
-          `http://localhost:5000/api/admin/products?page=${pageNum}&limit=10&search=${searchTerm}`,
+          `${API_BASE_URL}/admin/products?page=${pageNum}&limit=10&search=${searchTerm}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -159,7 +161,7 @@ function ProductManagement({ initialProductId = '' }) {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch(`http://localhost:5000/api/admin/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/products/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -192,7 +194,7 @@ function ProductManagement({ initialProductId = '' }) {
       setLoading(true);
       setError('');
       const response = await fetch(
-        `http://localhost:5000/api/admin/products?page=${page}&limit=10&search=${searchTerm}`,
+        `${API_BASE_URL}/admin/products?page=${page}&limit=10&search=${searchTerm}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -224,7 +226,7 @@ function ProductManagement({ initialProductId = '' }) {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/products/${productId}`,
+        `${API_BASE_URL}/admin/products/${productId}`,
         {
           method: 'DELETE',
           headers: {

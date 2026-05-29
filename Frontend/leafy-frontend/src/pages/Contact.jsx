@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import '../styles/Contact.css';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function Contact() {
   const [formData, setFormData] = useState({
     name: '',
@@ -42,7 +44,7 @@ function Contact() {
     setFormStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const response = await fetch(`${API_BASE_URL}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

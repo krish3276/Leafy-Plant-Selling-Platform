@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Trash2, Check, Eye } from 'lucide-react';
 import './AdminContactMessages.css';
 
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/contact`;
+
 function AdminContactMessages() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ function AdminContactMessages() {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const url = `http://localhost:5000/api/contact?filter=${filter}&page=${page}&limit=10`;
+      const url = `${API_BASE}?filter=${filter}&page=${page}&limit=10`;
 
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -40,7 +42,7 @@ function AdminContactMessages() {
   const handleViewMessage = async (messageId) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/contact/${messageId}`, {
+      const response = await fetch(`${API_BASE}/${messageId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
@@ -57,7 +59,7 @@ function AdminContactMessages() {
   const handleMarkAsRead = async (messageId) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/contact/${messageId}`, {
+      const response = await fetch(`${API_BASE}/${messageId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ function AdminContactMessages() {
 
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/contact/${messageId}`, {
+      const response = await fetch(`${API_BASE}/${messageId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });

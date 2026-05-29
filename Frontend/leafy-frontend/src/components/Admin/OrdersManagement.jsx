@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import './OrdersManagement.css';
 
-const API_BASE = 'http://localhost:5000/api/orders';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/orders`;
 
 const orderStatusOptions = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 const paymentStatusOptions = ['pending', 'paid', 'failed', 'refunded'];

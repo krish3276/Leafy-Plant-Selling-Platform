@@ -3,6 +3,8 @@ import { X, AlertCircle } from 'lucide-react';
 import './ProductForm.css';
 import ImageUploader from '../ImageUploader';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function ProductForm({ product, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -60,8 +62,8 @@ function ProductForm({ product, onClose, onSuccess }) {
       }
 
       const url = product
-        ? `http://localhost:5000/api/admin/products/${product._id}`
-        : 'http://localhost:5000/api/admin/products';
+        ? `${API_BASE_URL}/admin/products/${product._id}`
+        : `${API_BASE_URL}/admin/products`;
 
       const method = product ? 'PUT' : 'POST';
 

@@ -3,7 +3,7 @@
  * Handles opening the Razorpay payment modal with test-mode configuration.
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 /**
  * Creates a Razorpay order on the backend and opens the payment modal.

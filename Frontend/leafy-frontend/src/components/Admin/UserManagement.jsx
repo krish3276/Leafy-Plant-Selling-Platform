@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Search, Shield, Trash2, AlertCircle } from 'lucide-react';
 import './UserManagement.css';
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 function UserManagement({ initialRoleFilter = '' }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ function UserManagement({ initialRoleFilter = '' }) {
       setLoading(true);
       setError('');
       const response = await fetch(
-        `http://localhost:5000/api/admin/users?page=${page}&limit=10&search=${searchTerm}&role=${roleFilter}`,
+        `${API_BASE_URL}/admin/users?page=${page}&limit=10&search=${searchTerm}&role=${roleFilter}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -71,7 +73,7 @@ function UserManagement({ initialRoleFilter = '' }) {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}/role`,
+        `${API_BASE_URL}/admin/users/${userId}/role`,
         {
           method: 'PUT',
           headers: {
@@ -105,7 +107,7 @@ function UserManagement({ initialRoleFilter = '' }) {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}/deactivate`,
+        `${API_BASE_URL}/admin/users/${userId}/deactivate`,
         {
           method: 'PUT',
           headers: {

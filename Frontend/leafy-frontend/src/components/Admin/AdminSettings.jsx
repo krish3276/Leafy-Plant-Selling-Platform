@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Save, Lock, Bell, Shield, Eye, EyeOff, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
 import '../../styles/AdminSettings.css';
 
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/admin`;
+
 function AdminSettings() {
   const [activeSection, setActiveSection] = useState('profile');
   const [loading, setLoading] = useState(false);
@@ -64,8 +66,6 @@ function AdminSettings() {
   });
 
   const token = localStorage.getItem('authToken');
-  const API_BASE = 'http://localhost:5000/api/admin';
-
   // Fetch admin profile on mount
   useEffect(() => {
     fetchAdminProfile();

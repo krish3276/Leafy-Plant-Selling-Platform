@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import '../../styles/AdminNotifications.css';
 
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/notifications`;
+
 function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -22,8 +24,6 @@ function AdminNotifications() {
   const [totalPages, setTotalPages] = useState(1);
 
   const token = localStorage.getItem('authToken');
-  const API_BASE = 'http://localhost:5000/api/notifications';
-
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
