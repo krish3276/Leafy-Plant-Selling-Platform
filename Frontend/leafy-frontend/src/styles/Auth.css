@@ -212,6 +212,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 2rem;
+  justify-items: center;
 }
 
 .google-auth-button-wrap {
@@ -230,8 +231,9 @@
 }
 
 .google-auth-button-wrap > div > div {
-  width: 100% !important;
+  width: auto !important;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 .oauth-disabled-message {
@@ -243,6 +245,7 @@
 
 .google-auth-button-wrap iframe {
   margin: 0 auto;
+  display: block;
 }
 
 .oauth-button {
