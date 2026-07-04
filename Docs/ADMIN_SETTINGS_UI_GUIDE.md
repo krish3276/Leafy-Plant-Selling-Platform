@@ -81,7 +81,7 @@
 │ [••••••••••] [👁️ Show]                         │
 │                                                │
 │ ┌─ Password requirements ─────────────────┐  │
-│ │ ✓ At least 6 characters long            │  │
+│ │ ✓ 8-128 characters long                 │  │
 │ │ ✓ Must be different from current        │  │
 │ │ ✓ New password and confirm must match   │  │
 │ └────────────────────────────────────────┘  │
@@ -93,7 +93,7 @@
 ### User Actions
 1. Enter current password
 2. Click eye icon to show password (optional)
-3. Enter new password (min 6 characters)
+3. Enter new password (8-128 characters)
 4. Click eye icon to show (optional)
 5. Re-enter password to confirm
 6. Click **Change Password** button
@@ -101,14 +101,14 @@
 
 ### Validation
 - ✅ Current password must be correct
-- ✅ New password min 6 characters
+- ✅ New password 8-128 characters
 - ✅ Passwords must match
 - ✅ Can't be same as current
 
 ### Error Messages
 - ❌ "Current password is incorrect"
 - ❌ "New passwords do not match"
-- ❌ "New password must be at least 6 characters"
+- ❌ "New password must be at least 8 characters"
 
 ---
 

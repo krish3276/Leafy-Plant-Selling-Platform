@@ -146,12 +146,13 @@ function Login() {
               <label htmlFor="password">Password</label>
               <div className="input-wrapper">
                 <Lock size={18} className="input-icon" />
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    maxLength={128}
+                    required
                 />
               </div>
             </div>

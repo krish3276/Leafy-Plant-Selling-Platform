@@ -31,8 +31,8 @@ export const signupValidation = [
   body('password')
     .notEmpty()
     .withMessage('Password is required')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters')
+    .isLength({ min: 8, max: 128 })
+    .withMessage('Password must be 8-128 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/) // Regex for strong password
     .withMessage('Password must contain uppercase, lowercase, and number'),
 
@@ -65,7 +65,9 @@ export const loginValidation = [
   // Password Validation (just check it exists)
   body('password')
     .notEmpty()
-    .withMessage('Password is required'),
+    .withMessage('Password is required')
+    .isLength({ max: 128 })
+    .withMessage('Password must not exceed 128 characters'),
 ];
 
 /**

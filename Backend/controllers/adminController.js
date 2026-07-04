@@ -479,10 +479,21 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 6) {
+    if (
+      currentPassword.length > 128 ||
+      newPassword.length > 128 ||
+      confirmPassword.length > 128
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'New password must be at least 6 characters long',
+        message: 'Passwords must not exceed 128 characters',
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 8 characters long',
       });
     }
 

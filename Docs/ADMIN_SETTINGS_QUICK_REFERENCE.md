@@ -34,7 +34,7 @@ Password: Admin@123456
 **What:** Change admin password
 **Fields:**
 - Current Password
-- New Password (min 6 chars)
+- New Password (8-128 chars)
 - Confirm Password
 
 **Requirements:**
@@ -199,7 +199,7 @@ Docs:
 | "First name and last name required" | Fill both name fields |
 | "Current password is incorrect" | Check current password |
 | "New passwords do not match" | Confirm password exactly |
-| "New password must be at least 6 characters" | Use 6+ character password |
+| "New password must be at least 8 characters" | Use 8-128 character password |
 | "All password fields required" | Fill all 3 password fields |
 
 ---

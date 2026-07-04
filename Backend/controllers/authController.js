@@ -18,6 +18,13 @@ export const signup = async (req, res) => {
     // req.body contains the JSON data sent from frontend
     const { firstName, lastName, email, password } = req.body;
 
+    if (password.length > 128) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must not exceed 128 characters',
+      });
+    }
+
     // 3. CHECK IF USER ALREADY EXISTS
     // findOne() searches for one document matching the query
     const existingUser = await User.findOne({ email });

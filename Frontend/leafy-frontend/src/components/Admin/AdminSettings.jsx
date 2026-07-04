@@ -334,8 +334,18 @@ function AdminSettings() {
         return;
       }
 
-      if (passwordData.newPassword.length < 6) {
-        showNotification('New password must be at least 6 characters', 'error');
+      if (
+        passwordData.currentPassword.length > 128 ||
+        passwordData.newPassword.length > 128 ||
+        passwordData.confirmPassword.length > 128
+      ) {
+        showNotification('Passwords must not exceed 128 characters', 'error');
+        setLoading(false);
+        return;
+      }
+
+      if (passwordData.newPassword.length < 8) {
+        showNotification('New password must be at least 8 characters', 'error');
         setLoading(false);
         return;
       }
@@ -516,6 +526,7 @@ function AdminSettings() {
                     value={passwordData.currentPassword}
                     onChange={handlePasswordChange}
                     placeholder="Enter current password"
+                    maxLength={128}
                   />
                   <button
                     type="button"
@@ -541,7 +552,8 @@ function AdminSettings() {
                     name="newPassword"
                     value={passwordData.newPassword}
                     onChange={handlePasswordChange}
-                    placeholder="Enter new password (min 6 characters)"
+                    placeholder="Enter new password (8-128 characters)"
+                    maxLength={128}
                   />
                   <button
                     type="button"
@@ -568,6 +580,7 @@ function AdminSettings() {
                     value={passwordData.confirmPassword}
                     onChange={handlePasswordChange}
                     placeholder="Confirm new password"
+                    maxLength={128}
                   />
                   <button
                     type="button"
@@ -587,7 +600,7 @@ function AdminSettings() {
               <div className="password-requirements">
                 <p>Password requirements:</p>
                 <ul>
-                  <li>At least 6 characters long</li>
+                  <li>8-128 characters long</li>
                   <li>Must be different from current password</li>
                   <li>New password and confirm password must match</li>
                 </ul>

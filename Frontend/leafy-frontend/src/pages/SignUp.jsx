@@ -113,8 +113,14 @@ function SignUp() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length > 128) {
+      setError('Password must not exceed 128 characters');
       setLoading(false);
       return;
     }
@@ -252,6 +258,7 @@ function SignUp() {
                   id="password"
                   name="password"
                   placeholder="Enter your password"
+                  maxLength={128}
                   required
                   disabled={loading}
                 />
@@ -263,7 +270,7 @@ function SignUp() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <p className="password-hint">At least 6 characters</p>
+              <p className="password-hint">8-128 characters</p>
             </div>
 
             <div className="form-group">
@@ -275,6 +282,7 @@ function SignUp() {
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="Confirm your password"
+                  maxLength={128}
                   required
                   disabled={loading}
                 />

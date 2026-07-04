@@ -342,7 +342,7 @@ Response: {
 **Change Password:**
 1. Click "Security" tab
 2. Enter current password
-3. Enter new password (min 6 chars)
+3. Enter new password (8-128 chars)
 4. Confirm new password
 5. Click "Change Password"
 6. See success notification

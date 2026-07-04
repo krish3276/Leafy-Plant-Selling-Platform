@@ -77,7 +77,7 @@ Request → Express receives it on port 5000
   ✓ Check firstName (required, 2-50 chars, letters only)
   ✓ Check lastName (same)
   ✓ Check email (valid format)
-  ✓ Check password (min 6 chars, strong)
+  ✓ Check password (8-128 chars, strong)
   ✓ Check confirmPassword (matches password)
   
 → If ANY validation fails: STOP, return 400 error
